@@ -345,6 +345,12 @@ function App() {
             <div style={scoreLabelStyle}>LEVEL</div>
             <div style={scoreValueStyle}>{level}</div>
           </div>
+
+          {/* Panel Score */}
+          <div style={scorePanel}>
+            <div style={scoreLabelStyle}>SCORE</div>
+            <div style={scoreValueStyle}>{score}</div>
+          </div>
         </div>
       </div>
     )
