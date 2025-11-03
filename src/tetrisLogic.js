@@ -145,10 +145,48 @@ export const GAME_STATES = {
   GAME_OVER: 'gameOver'
 };
 
-// Obtener una pieza aleatoria
-export const getRandomTetromino = () => {
+// ============================================
+// SISTEMA DE BOLSA DE 7 (7-BAG RANDOMIZER)
+// ============================================
+
+// Bolsa global para el sistema de generación de piezas
+let pieceBag = [];
+
+// Mezclar array usando algoritmo Fisher-Yates
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// Llenar la bolsa con las 7 piezas y mezclarlas
+const fillBag = () => {
   const pieces = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-  const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
+  pieceBag = shuffleArray(pieces);
+};
+
+// Obtener la siguiente pieza de la bolsa
+const getPieceFromBag = () => {
+  // Si la bolsa está vacía, llenarla y mezclarla
+  if (pieceBag.length === 0) {
+    fillBag();
+  }
+  
+  // Sacar una pieza de la bolsa
+  return pieceBag.pop();
+};
+
+// Reiniciar la bolsa (útil al iniciar un nuevo juego)
+export const resetBag = () => {
+  pieceBag = [];
+};
+
+// Obtener una pieza aleatoria usando el sistema de bolsa de 7
+export const getRandomTetromino = () => {
+  const randomPiece = getPieceFromBag();
   return {
     type: randomPiece,
     shape: TETROMINOS[randomPiece].shape[0], // Primera rotación
@@ -493,6 +531,9 @@ export const spawnNextPiece = (nextPiece) => {
 
 // Iniciar el juego
 export const startGame = () => {
+  // Reiniciar la bolsa para un nuevo juego
+  resetBag();
+  
   const initialState = createInitialGameState();
   
   return {
