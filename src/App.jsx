@@ -5,6 +5,8 @@ import logo from './assets/logo.png'
 function App() {
   const [currentView, setCurrentView] = useState('splash')
   const [hoveredButton, setHoveredButton] = useState(null)
+  const [level, setLevel] = useState(1)
+  const [score, setScore] = useState(236)
 
   // Paleta de colores
   const colors = {
@@ -266,6 +268,41 @@ function App() {
 
   // GAME - Vista del juego
   if (currentView === 'game') {
+    // Estilo para los paneles del marcador
+    const scorePanel = {
+      backgroundColor: colors.panel,
+      border: `3px solid ${colors.border}`,
+      padding: '12px 18px',
+      minWidth: '100px',
+      textAlign: 'center',
+      boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+      fontFamily: "'Press Start 2P', cursive"
+    }
+
+    const scoreLabelStyle = {
+      fontSize: '8px',
+      color: colors.textSecondary,
+      marginBottom: '8px',
+      letterSpacing: '1px'
+    }
+
+    const scoreValueStyle = {
+      fontSize: '20px',
+      color: colors.textPrimary,
+      textShadow: `0 0 10px ${colors.hover}, 0 0 15px ${colors.hover}`,
+      letterSpacing: '2px'
+    }
+
+    const nextPreviewStyle = {
+      width: '35px',
+      height: '35px',
+      backgroundColor: colors.disabled,
+      border: `2px solid ${colors.border}`,
+      boxShadow: `inset 0 0 10px ${colors.background}, 0 0 8px ${colors.border}60`,
+      display: 'inline-block',
+      margin: '2px'
+    }
+
     return (
       <div style={{ 
         height: '100vh', 
@@ -274,8 +311,8 @@ function App() {
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px',
+        justifyContent: 'flex-start',
+        padding: '20px',
         overflow: 'hidden',
         position: 'relative'
       }}>
@@ -293,21 +330,22 @@ function App() {
           <House size={32} weight="bold" color={colors.textPrimary} />
         </button>
 
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 'normal', 
-          textAlign: 'center',
-          color: colors.textPrimary,
-          textShadow: `
-            2px 2px 0px ${colors.primary},
-            4px 4px 0px ${colors.accent},
-            0 0 20px ${colors.primary}
-          `,
-          fontFamily: "'Press Start 2P', cursive",
-          letterSpacing: '3px'
+        {/* Marcador Superior */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginTop: '80px',
+          marginBottom: '20px',
+          justifyContent: 'center',
+          width: '100%',
+          maxWidth: '400px'
         }}>
-          GAME
-        </h1>
+          {/* Panel Level */}
+          <div style={scorePanel}>
+            <div style={scoreLabelStyle}>LEVEL</div>
+            <div style={scoreValueStyle}>{level}</div>
+          </div>
+        </div>
       </div>
     )
   }
