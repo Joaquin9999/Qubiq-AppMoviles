@@ -252,3 +252,119 @@ export const clonePiece = (piece) => {
     shape: piece.shape.map(row => [...row])
   };
 };
+
+// ============================================
+// PASO 3: MOVIMIENTO BÁSICO Y VALIDACIÓN
+// ============================================
+
+// Verificar si una posición está dentro de los límites del tablero
+const isWithinBounds = (x, y) => {
+  return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT;
+};
+
+// Verificar si una pieza colisiona con el tablero o con otras piezas
+export const checkCollision = (piece, board) => {
+  const coordinates = getPieceCoordinates(piece);
+  
+  for (let coord of coordinates) {
+    const { x, y } = coord;
+    
+    // Verificar límites del tablero
+    if (!isWithinBounds(x, y)) {
+      return true;
+    }
+    
+    // Verificar colisión con piezas ya colocadas
+    if (board[y] && board[y][x] !== 0) {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
+// Intentar mover la pieza a la izquierda
+export const tryMoveLeft = (piece, board) => {
+  const movedPiece = movePieceLeft(piece);
+  
+  if (checkCollision(movedPiece, board)) {
+    return piece; // No se puede mover, retornar pieza original
+  }
+  
+  return movedPiece;
+};
+
+// Intentar mover la pieza a la derecha
+export const tryMoveRight = (piece, board) => {
+  const movedPiece = movePieceRight(piece);
+  
+  if (checkCollision(movedPiece, board)) {
+    return piece; // No se puede mover, retornar pieza original
+  }
+  
+  return movedPiece;
+};
+
+// Intentar mover la pieza hacia abajo
+export const tryMoveDown = (piece, board) => {
+  const movedPiece = movePieceDown(piece);
+  
+  if (checkCollision(movedPiece, board)) {
+    return { piece, collided: true }; // Colisionó
+  }
+  
+  return { piece: movedPiece, collided: false };
+};
+
+// Intentar rotar la pieza
+export const tryRotate = (piece, board) => {
+  const rotatedPiece = rotatePiece(piece);
+  
+  if (checkCollision(rotatedPiece, board)) {
+    // Intentar wall kick (desplazar la pieza si rota cerca de una pared)
+    // Probar desplazamiento a la izquierda
+    const kickedLeft = { ...rotatedPiece, x: rotatedPiece.x - 1 };
+    if (!checkCollision(kickedLeft, board)) {
+      return kickedLeft;
+    }
+    
+    // Probar desplazamiento a la derecha
+    const kickedRight = { ...rotatedPiece, x: rotatedPiece.x + 1 };
+    if (!checkCollision(kickedRight, board)) {
+      return kickedRight;
+    }
+    
+    // Probar desplazamiento doble a la derecha
+    const kickedRight2 = { ...rotatedPiece, x: rotatedPiece.x + 2 };
+    if (!checkCollision(kickedRight2, board)) {
+      return kickedRight2;
+    }
+    
+    return piece; // No se puede rotar
+  }
+  
+  return rotatedPiece;
+};
+
+// Caída rápida (hard drop) - dejar caer la pieza hasta el fondo
+export const hardDrop = (piece, board) => {
+  let droppedPiece = { ...piece };
+  let distance = 0;
+  
+  while (true) {
+    const movedDown = movePieceDown(droppedPiece);
+    if (checkCollision(movedDown, board)) {
+      break;
+    }
+    droppedPiece = movedDown;
+    distance++;
+  }
+  
+  return { piece: droppedPiece, distance };
+};
+
+// Obtener la posición fantasma (ghost piece) - muestra dónde caerá la pieza
+export const getGhostPiece = (piece, board) => {
+  const { piece: ghostPiece } = hardDrop(piece, board);
+  return ghostPiece;
+};
