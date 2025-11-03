@@ -1,12 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { House, Trophy, GameController, Question } from 'phosphor-react'
 import logo from './assets/logo.png'
+import {
+  startGame,
+  gameTick,
+  handlePlayerAction,
+  getDropSpeed,
+  GAME_STATES
+} from './tetrisLogic'
 
 function App() {
   const [currentView, setCurrentView] = useState('splash')
   const [hoveredButton, setHoveredButton] = useState(null)
-  const [level, setLevel] = useState(1)
-  const [score, setScore] = useState(236)
+  
+  // Estado del juego
+  const [gameState, setGameState] = useState(null)
+  const gameLoopRef = useRef(null)
 
   // Paleta de colores
   const colors = {
@@ -63,6 +72,132 @@ function App() {
 
   const handleSplashClick = () => {
     setCurrentView('menu')
+  }
+
+  // Iniciar el juego
+  const initGame = () => {
+    const newGame = startGame()
+    setGameState(newGame)
+  }
+
+  // Loop del juego - Caída automática
+  useEffect(() => {
+    if (!gameState || gameState.gameState !== GAME_STATES.PLAYING) {
+      if (gameLoopRef.current) {
+        clearInterval(gameLoopRef.current)
+        gameLoopRef.current = null
+      }
+      return
+    }
+
+    const dropSpeed = getDropSpeed(gameState.level)
+    
+    gameLoopRef.current = setInterval(() => {
+      setGameState(prevState => gameTick(prevState))
+    }, dropSpeed)
+
+    return () => {
+      if (gameLoopRef.current) {
+        clearInterval(gameLoopRef.current)
+      }
+    }
+  }, [gameState?.gameState, gameState?.level])
+
+  // Manejar controles del jugador
+  const handleControl = (action) => {
+    if (!gameState || gameState.gameState !== GAME_STATES.PLAYING) return
+    
+    setGameState(prevState => handlePlayerAction(action, prevState))
+  }
+
+  // Renderizar el tablero
+  const renderBoard = () => {
+    if (!gameState) return null
+
+    const { board, currentPiece } = gameState
+    
+    // Crear una copia del tablero para mostrar
+    const displayBoard = board.map(row => [...row])
+    
+    // Dibujar la pieza actual en el tablero de display
+    const { shape, x, y, color } = currentPiece
+    for (let row = 0; row < shape.length; row++) {
+      for (let col = 0; col < shape[row].length; col++) {
+        if (shape[row][col]) {
+          const boardY = y + row
+          const boardX = x + col
+          if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
+            displayBoard[boardY][boardX] = color
+          }
+        }
+      }
+    }
+
+    // Renderizar las celdas
+    return displayBoard.map((row, rowIndex) => 
+      row.map((cell, colIndex) => (
+        <div
+          key={`${rowIndex}-${colIndex}`}
+          style={{
+            backgroundColor: cell || colors.panel,
+            border: cell ? `1px solid ${colors.background}` : `1px solid ${colors.disabled}30`,
+            boxShadow: cell ? `0 0 5px ${cell}80` : 'none'
+          }}
+        />
+      ))
+    )
+  }
+
+  // Renderizar la pieza "Next"
+  const renderNextPiece = () => {
+    if (!gameState || !gameState.nextPiece) {
+      // Mostrar bloques vacíos por defecto
+      return (
+        <>
+          <div style={nextPreviewStyle}></div>
+          <div style={nextPreviewStyle}></div>
+        </>
+      )
+    }
+
+    const { shape, color } = gameState.nextPiece
+    const cells = []
+    
+    // Encontrar bloques no vacíos
+    for (let row = 0; row < shape.length; row++) {
+      for (let col = 0; col < shape[row].length; col++) {
+        if (shape[row][col]) {
+          cells.push(
+            <div
+              key={`next-${row}-${col}`}
+              style={{
+                ...nextPreviewStyle,
+                backgroundColor: color,
+                boxShadow: `0 0 8px ${color}80, inset 0 0 5px ${color}40`
+              }}
+            />
+          )
+        }
+      }
+    }
+    
+    // Limitar a 2 bloques para el display
+    return cells.slice(0, 2).length > 0 ? cells.slice(0, 2) : (
+      <>
+        <div style={nextPreviewStyle}></div>
+        <div style={nextPreviewStyle}></div>
+      </>
+    )
+  }
+
+  const nextPreviewStyle = {
+    width: '28px',
+    height: '28px',
+    backgroundColor: colors.disabled,
+    border: `2px solid ${colors.border}`,
+    boxShadow: `inset 0 0 8px ${colors.background}, 0 0 6px ${colors.border}60`,
+    display: 'inline-block',
+    margin: '2px'
   }
 
   // SPLASH SCREEN - Pantalla de bienvenida
@@ -268,6 +403,11 @@ function App() {
 
   // GAME - Vista del juego
   if (currentView === 'game') {
+    // Iniciar el juego si no existe
+    if (!gameState) {
+      initGame()
+    }
+
     // Estilo base para los paneles del marcador
     const scorePanelBase = {
       backgroundColor: colors.panel,
@@ -334,16 +474,6 @@ function App() {
       letterSpacing: '1px'
     }
 
-    const nextPreviewStyle = {
-      width: '28px',
-      height: '28px',
-      backgroundColor: colors.disabled,
-      border: `2px solid ${colors.border}`,
-      boxShadow: `inset 0 0 8px ${colors.background}, 0 0 6px ${colors.border}60`,
-      display: 'inline-block',
-      margin: '2px'
-    }
-
     return (
       <div style={{ 
         height: '100vh', 
@@ -404,7 +534,7 @@ function App() {
           {/* Panel Level (Izquierda) */}
           <div style={levelPanel}>
             <div style={scoreLabelStyle}>LEVEL</div>
-            <div style={scoreValueStyle}>{level}</div>
+            <div style={scoreValueStyle}>{gameState?.level || 1}</div>
           </div>
 
           {/* Panel Next (Centro - Grande y Cuadrado) */}
@@ -417,8 +547,7 @@ function App() {
                 gap: '3px',
                 justifyContent: 'center'
               }}>
-                <div style={nextPreviewStyle}></div>
-                <div style={nextPreviewStyle}></div>
+                {renderNextPiece()}
               </div>
             </div>
           </div>
@@ -426,7 +555,7 @@ function App() {
           {/* Panel Score (Derecha) */}
           <div style={scorePanel}>
             <div style={scoreLabelStyle}>SCORE</div>
-            <div style={scoreValueStyle}>{score}</div>
+            <div style={scoreValueStyle}>{gameState?.score || 0}</div>
           </div>
         </div>
 
@@ -450,7 +579,7 @@ function App() {
             gap: '1px',
             padding: '2px'
           }}>
-            {/* Aquí irán las celdas del juego */}
+            {renderBoard()}
           </div>
         </div>
 
@@ -470,62 +599,68 @@ function App() {
             alignItems: 'center'
           }}>
             {/* Flecha Izquierda */}
-            <button style={{
-              width: '80px',
-              height: '80px',
-              backgroundColor: colors.panel,
-              border: `3px solid ${colors.border}`,
-              color: colors.textPrimary,
-              fontSize: '40px',
-              cursor: 'pointer',
-              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease'
-            }}>
+            <button 
+              onClick={() => handleControl('MOVE_LEFT')}
+              style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: colors.panel,
+                border: `3px solid ${colors.border}`,
+                color: colors.textPrimary,
+                fontSize: '40px',
+                cursor: 'pointer',
+                boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}>
               ◄
             </button>
 
             {/* Flecha Derecha */}
-            <button style={{
-              width: '80px',
-              height: '80px',
-              backgroundColor: colors.panel,
-              border: `3px solid ${colors.border}`,
-              color: colors.textPrimary,
-              fontSize: '40px',
-              cursor: 'pointer',
-              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease'
-            }}>
+            <button 
+              onClick={() => handleControl('MOVE_RIGHT')}
+              style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: colors.panel,
+                border: `3px solid ${colors.border}`,
+                color: colors.textPrimary,
+                fontSize: '40px',
+                cursor: 'pointer',
+                boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}>
               ►
             </button>
           </div>
 
           {/* Botón de Rotación (Derecha) */}
-          <button style={{
-            flex: '1',
-            height: '80px',
-            backgroundColor: colors.panel,
-            border: `3px solid ${colors.border}`,
-            color: colors.textPrimary,
-            fontSize: '10px',
-            fontFamily: "'Press Start 2P', cursive",
-            cursor: 'pointer',
-            boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'all 0.2s ease',
-            letterSpacing: '1px',
-            marginLeft: '15px'
-          }}>
+          <button 
+            onClick={() => handleControl('ROTATE')}
+            style={{
+              flex: '1',
+              height: '80px',
+              backgroundColor: colors.panel,
+              border: `3px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '10px',
+              fontFamily: "'Press Start 2P', cursive",
+              cursor: 'pointer',
+              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s ease',
+              letterSpacing: '1px',
+              marginLeft: '15px'
+            }}>
             <div style={{ fontSize: '28px' }}>↻</div>
             <div>ROTATE</div>
           </button>
