@@ -171,3 +171,84 @@ export const createInitialGameState = () => {
     lines: 0
   };
 };
+
+// ============================================
+// PASO 2: SISTEMA DE PIEZAS
+// ============================================
+
+// Rotar pieza en sentido horario
+export const rotatePiece = (piece) => {
+  const { type, rotation } = piece;
+  const tetromino = TETROMINOS[type];
+  const nextRotation = (rotation + 1) % tetromino.shape.length;
+  
+  return {
+    ...piece,
+    shape: tetromino.shape[nextRotation],
+    rotation: nextRotation
+  };
+};
+
+// Rotar pieza en sentido antihorario
+export const rotatePieceCounterClockwise = (piece) => {
+  const { type, rotation } = piece;
+  const tetromino = TETROMINOS[type];
+  const nextRotation = rotation === 0 ? tetromino.shape.length - 1 : rotation - 1;
+  
+  return {
+    ...piece,
+    shape: tetromino.shape[nextRotation],
+    rotation: nextRotation
+  };
+};
+
+// Mover pieza a la izquierda
+export const movePieceLeft = (piece) => {
+  return {
+    ...piece,
+    x: piece.x - 1
+  };
+};
+
+// Mover pieza a la derecha
+export const movePieceRight = (piece) => {
+  return {
+    ...piece,
+    x: piece.x + 1
+  };
+};
+
+// Mover pieza hacia abajo
+export const movePieceDown = (piece) => {
+  return {
+    ...piece,
+    y: piece.y + 1
+  };
+};
+
+// Obtener las coordenadas absolutas de la pieza en el tablero
+export const getPieceCoordinates = (piece) => {
+  const coordinates = [];
+  const { shape, x, y } = piece;
+  
+  for (let row = 0; row < shape.length; row++) {
+    for (let col = 0; col < shape[row].length; col++) {
+      if (shape[row][col]) {
+        coordinates.push({
+          x: x + col,
+          y: y + row
+        });
+      }
+    }
+  }
+  
+  return coordinates;
+};
+
+// Clonar una pieza
+export const clonePiece = (piece) => {
+  return {
+    ...piece,
+    shape: piece.shape.map(row => [...row])
+  };
+};
