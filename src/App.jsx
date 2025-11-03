@@ -277,28 +277,40 @@ function App() {
       fontFamily: "'Press Start 2P', cursive"
     }
 
-    // Panel pequeño para Level
+    // Panel pequeño para Level (izquierda)
     const levelPanel = {
       ...scorePanelBase,
-      padding: '8px 10px',
+      padding: '12px 15px',
       flex: '0 0 auto',
-      minWidth: '60px'
+      minWidth: '80px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center'
     }
 
-    // Panel mediano para Score
+    // Panel pequeño para Score (derecha)
     const scorePanel = {
       ...scorePanelBase,
-      padding: '8px 12px',
-      flex: '1',
-      minWidth: '100px'
+      padding: '12px 15px',
+      flex: '0 0 auto',
+      minWidth: '80px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center'
     }
 
-    // Panel para Next
+    // Panel grande y cuadrado para Next (centro)
     const nextPanel = {
       ...scorePanelBase,
-      padding: '8px 10px',
+      padding: '8px',
       flex: '0 0 auto',
-      minWidth: '80px'
+      minWidth: '95px',
+      width: '95px',
+      height: '95px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center'
     }
 
     const scoreLabelStyle = {
@@ -315,14 +327,21 @@ function App() {
       letterSpacing: '1px'
     }
 
+    const nextLabelStyle = {
+      fontSize: '8px',
+      color: colors.textSecondary,
+      marginBottom: '10px',
+      letterSpacing: '1px'
+    }
+
     const nextPreviewStyle = {
-      width: '26px',
-      height: '26px',
+      width: '28px',
+      height: '28px',
       backgroundColor: colors.disabled,
       border: `2px solid ${colors.border}`,
       boxShadow: `inset 0 0 8px ${colors.background}, 0 0 6px ${colors.border}60`,
       display: 'inline-block',
-      margin: '1px'
+      margin: '2px'
     }
 
     return (
@@ -334,7 +353,8 @@ function App() {
         flexDirection: 'column', 
         alignItems: 'center',
         justifyContent: 'flex-start',
-        padding: '20px',
+        padding: '10px',
+        paddingTop: '100px',
         overflow: 'hidden',
         position: 'relative'
       }}>
@@ -352,45 +372,61 @@ function App() {
           <House size={32} weight="bold" color={colors.textPrimary} />
         </button>
 
+        {/* Logo - centrado en la pantalla, alineado con el botón home */}
+        <img 
+          src={logo} 
+          alt="TETRIS" 
+          style={{ 
+            position: 'absolute',
+            top: '30px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '150px',
+            maxWidth: '50vw',
+            height: 'auto',
+            imageRendering: 'pixelated',
+            filter: `drop-shadow(0 0 15px ${colors.border})`
+          }} 
+        />
+
         {/* Marcador Superior */}
         <div style={{
           display: 'flex',
-          gap: '6px',
-          marginTop: '80px',
-          marginBottom: '20px',
+          gap: '8px',
+          marginBottom: '10px',
+          marginTop: '5px',
           justifyContent: 'center',
+          alignItems: 'center',
           width: '100%',
           maxWidth: '100%',
-          padding: '0 5px'
+          padding: '0 10px'
         }}>
-          {/* Panel Level */}
+          {/* Panel Level (Izquierda) */}
           <div style={levelPanel}>
             <div style={scoreLabelStyle}>LEVEL</div>
             <div style={scoreValueStyle}>{level}</div>
           </div>
 
-          {/* Panel Score */}
-          <div style={scorePanel}>
-            <div style={scoreLabelStyle}>SCORE</div>
-            <div style={scoreValueStyle}>{score}</div>
-          </div>
-
-          {/* Panel Next */}
+          {/* Panel Next (Centro - Grande y Cuadrado) */}
           <div style={nextPanel}>
-            <div style={scoreLabelStyle}>NEXT</div>
-            <div style={{ marginTop: '6px' }}>
+            <div style={nextLabelStyle}>NEXT</div>
+            <div>
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '2px',
-                justifyContent: 'center',
-                maxWidth: '56px',
-                margin: '0 auto'
+                gap: '3px',
+                justifyContent: 'center'
               }}>
                 <div style={nextPreviewStyle}></div>
                 <div style={nextPreviewStyle}></div>
               </div>
             </div>
+          </div>
+
+          {/* Panel Score (Derecha) */}
+          <div style={scorePanel}>
+            <div style={scoreLabelStyle}>SCORE</div>
+            <div style={scoreValueStyle}>{score}</div>
           </div>
         </div>
       </div>
