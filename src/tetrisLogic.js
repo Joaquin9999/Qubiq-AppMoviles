@@ -476,3 +476,168 @@ export const lockPiece = (piece, board, currentScore, currentLevel, currentLines
     linesCleared
   };
 };
+
+// ============================================
+// PASO 6: SISTEMA DE JUEGO
+// ============================================
+
+// Generar nueva pieza y avanzar la siguiente
+export const spawnNextPiece = (nextPiece) => {
+  const newNextPiece = getRandomTetromino();
+  
+  return {
+    currentPiece: nextPiece,
+    nextPiece: newNextPiece
+  };
+};
+
+// Iniciar el juego
+export const startGame = () => {
+  const initialState = createInitialGameState();
+  
+  return {
+    ...initialState,
+    gameState: GAME_STATES.PLAYING
+  };
+};
+
+// Pausar el juego
+export const pauseGame = (gameState) => {
+  if (gameState === GAME_STATES.PLAYING) {
+    return GAME_STATES.PAUSED;
+  } else if (gameState === GAME_STATES.PAUSED) {
+    return GAME_STATES.PLAYING;
+  }
+  return gameState;
+};
+
+// Terminar el juego (Game Over)
+export const endGame = () => {
+  return GAME_STATES.GAME_OVER;
+};
+
+// Reiniciar el juego
+export const resetGame = () => {
+  return startGame();
+};
+
+// Actualizar el tick del juego (caída automática)
+export const gameTick = (gameState) => {
+  const { currentPiece, board, score, level, lines, nextPiece } = gameState;
+  
+  // Intentar mover la pieza hacia abajo
+  const { piece: movedPiece, collided } = tryMoveDown(currentPiece, board);
+  
+  if (!collided) {
+    // La pieza se movió correctamente
+    return {
+      ...gameState,
+      currentPiece: movedPiece
+    };
+  } else {
+    // La pieza colisionó, fijarla al tablero
+    const lockResult = lockPiece(currentPiece, board, score, level, lines);
+    
+    // Generar nueva pieza
+    const { currentPiece: newPiece, nextPiece: newNextPiece } = spawnNextPiece(nextPiece);
+    
+    // Verificar si hay Game Over
+    if (isGameOver(newPiece, lockResult.board)) {
+      return {
+        ...gameState,
+        ...lockResult,
+        gameState: GAME_STATES.GAME_OVER
+      };
+    }
+    
+    // Continuar el juego con nueva pieza
+    return {
+      ...gameState,
+      board: lockResult.board,
+      currentPiece: newPiece,
+      nextPiece: newNextPiece,
+      score: lockResult.score,
+      level: lockResult.level,
+      lines: lockResult.lines
+    };
+  }
+};
+
+// Procesar hard drop (caída instantánea)
+export const processHardDrop = (gameState) => {
+  const { currentPiece, board, score, level, lines, nextPiece } = gameState;
+  
+  // Dejar caer la pieza hasta el fondo
+  const { piece: droppedPiece, distance } = hardDrop(currentPiece, board);
+  
+  // Bonus por hard drop (2 puntos por celda)
+  const hardDropBonus = distance * 2;
+  
+  // Fijar la pieza al tablero
+  const lockResult = lockPiece(droppedPiece, board, score + hardDropBonus, level, lines);
+  
+  // Generar nueva pieza
+  const { currentPiece: newPiece, nextPiece: newNextPiece } = spawnNextPiece(nextPiece);
+  
+  // Verificar si hay Game Over
+  if (isGameOver(newPiece, lockResult.board)) {
+    return {
+      ...gameState,
+      ...lockResult,
+      gameState: GAME_STATES.GAME_OVER
+    };
+  }
+  
+  // Continuar el juego con nueva pieza
+  return {
+    ...gameState,
+    board: lockResult.board,
+    currentPiece: newPiece,
+    nextPiece: newNextPiece,
+    score: lockResult.score,
+    level: lockResult.level,
+    lines: lockResult.lines
+  };
+};
+
+// Manejar acciones del jugador
+export const handlePlayerAction = (action, gameState) => {
+  const { currentPiece, board } = gameState;
+  
+  switch (action) {
+    case 'MOVE_LEFT':
+      return {
+        ...gameState,
+        currentPiece: tryMoveLeft(currentPiece, board)
+      };
+      
+    case 'MOVE_RIGHT':
+      return {
+        ...gameState,
+        currentPiece: tryMoveRight(currentPiece, board)
+      };
+      
+    case 'MOVE_DOWN':
+      const { piece: downPiece, collided } = tryMoveDown(currentPiece, board);
+      if (!collided) {
+        return {
+          ...gameState,
+          currentPiece: downPiece,
+          score: gameState.score + 1 // Bonus por caída manual
+        };
+      }
+      return gameState;
+      
+    case 'ROTATE':
+      return {
+        ...gameState,
+        currentPiece: tryRotate(currentPiece, board)
+      };
+      
+    case 'HARD_DROP':
+      return processHardDrop(gameState);
+      
+    default:
+      return gameState;
+  }
+};
