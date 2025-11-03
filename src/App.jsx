@@ -409,6 +409,9 @@ function App() {
       initGame()
     }
 
+    // Verificar si el juego terminó
+    const isGameOver = gameState && gameState.gameState === GAME_STATES.GAME_OVER
+
     // Estilo base para los paneles del marcador
     const scorePanelBase = {
       backgroundColor: colors.panel,
@@ -702,6 +705,132 @@ function App() {
             FAST ▼▼▼
           </button>
         </div>
+
+        {/* Pop-up de Game Over */}
+        {isGameOver && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            animation: 'fadeIn 0.3s ease-in'
+          }}>
+            <div style={{
+              backgroundColor: colors.panel,
+              border: `6px solid ${colors.warning}`,
+              padding: '40px 50px',
+              boxShadow: `0 0 40px ${colors.warning}, inset 0 0 20px ${colors.warning}30`,
+              textAlign: 'center',
+              animation: 'popIn 0.4s ease-out',
+              maxWidth: '90%'
+            }}>
+              {/* Título GAME OVER */}
+              <h1 style={{
+                fontSize: '32px',
+                color: colors.warning,
+                fontFamily: "'Press Start 2P', cursive",
+                letterSpacing: '3px',
+                marginBottom: '30px',
+                textShadow: `0 0 20px ${colors.warning}, 0 0 30px ${colors.warning}`,
+                animation: 'pulse 1.5s ease-in-out infinite'
+              }}>
+                GAME<br/>OVER
+              </h1>
+
+              {/* Grid decorativo */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 30px)',
+                gap: '6px',
+                marginBottom: '25px',
+                justifyContent: 'center'
+              }}>
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} style={{
+                    width: '30px',
+                    height: '8px',
+                    backgroundColor: colors.panel,
+                    border: `2px solid ${colors.warning}`,
+                    boxShadow: `0 0 8px ${colors.warning}60`
+                  }} />
+                ))}
+              </div>
+
+              {/* Estadísticas finales */}
+              <div style={{
+                marginBottom: '30px'
+              }}>
+                <div style={{
+                  fontSize: '10px',
+                  color: colors.textSecondary,
+                  fontFamily: "'Press Start 2P', cursive",
+                  marginBottom: '10px',
+                  letterSpacing: '1px'
+                }}>
+                  FINAL SCORE
+                </div>
+                <div style={{
+                  fontSize: '24px',
+                  color: colors.hover,
+                  fontFamily: "'Press Start 2P', cursive",
+                  marginBottom: '20px',
+                  textShadow: `0 0 15px ${colors.hover}`,
+                  letterSpacing: '2px'
+                }}>
+                  {gameState?.score || 0}
+                </div>
+                <div style={{
+                  fontSize: '9px',
+                  color: colors.textSecondary,
+                  fontFamily: "'Press Start 2P', cursive",
+                  letterSpacing: '1px'
+                }}>
+                  LEVEL {gameState?.level || 1}
+                </div>
+              </div>
+
+              {/* Botón para volver al menú */}
+              <button
+                onClick={() => {
+                  setGameState(null)
+                  setCurrentView('menu')
+                }}
+                style={{
+                  width: '100%',
+                  padding: '15px 25px',
+                  backgroundColor: colors.panel,
+                  border: `4px solid ${colors.border}`,
+                  color: colors.textPrimary,
+                  fontSize: '12px',
+                  fontFamily: "'Press Start 2P', cursive",
+                  cursor: 'pointer',
+                  boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+                  letterSpacing: '2px',
+                  transition: 'all 0.2s ease',
+                  marginTop: '10px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = colors.primary
+                  e.target.style.borderColor = colors.hover
+                  e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = colors.panel
+                  e.target.style.borderColor = colors.border
+                  e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`
+                }}
+              >
+                BACK TO MENU
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
