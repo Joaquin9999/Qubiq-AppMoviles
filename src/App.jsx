@@ -16,6 +16,7 @@ function App() {
   // Estado del juego
   const [gameState, setGameState] = useState(null)
   const gameLoopRef = useRef(null)
+  const [isFastMode, setIsFastMode] = useState(false)
 
   // Paleta de colores
   const colors = {
@@ -90,7 +91,7 @@ function App() {
       return
     }
 
-    const dropSpeed = getDropSpeed(gameState.level)
+    const dropSpeed = isFastMode ? 50 : getDropSpeed(gameState.level)
     
     gameLoopRef.current = setInterval(() => {
       setGameState(prevState => gameTick(prevState))
@@ -101,7 +102,7 @@ function App() {
         clearInterval(gameLoopRef.current)
       }
     }
-  }, [gameState?.gameState, gameState?.level])
+  }, [gameState?.gameState, gameState?.level, isFastMode])
 
   // Manejar controles del jugador
   const handleControl = (action) => {
@@ -663,6 +664,42 @@ function App() {
             }}>
             <div style={{ fontSize: '28px' }}>↻</div>
             <div>ROTATE</div>
+          </button>
+        </div>
+
+        {/* Botón FAST - Barra Espaciadora */}
+        <div style={{
+          width: '100%',
+          maxWidth: '350px',
+          padding: '0 20px',
+          marginTop: '15px'
+        }}>
+          <button 
+            onMouseDown={() => setIsFastMode(true)}
+            onMouseUp={() => setIsFastMode(false)}
+            onMouseLeave={() => setIsFastMode(false)}
+            onTouchStart={() => setIsFastMode(true)}
+            onTouchEnd={() => setIsFastMode(false)}
+            style={{
+              width: '100%',
+              height: '50px',
+              backgroundColor: isFastMode ? colors.warning : colors.panel,
+              border: `3px solid ${isFastMode ? colors.hover : colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '14px',
+              fontFamily: "'Press Start 2P', cursive",
+              cursor: 'pointer',
+              boxShadow: isFastMode 
+                ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}40` 
+                : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s ease',
+              letterSpacing: '3px',
+              transform: isFastMode ? 'scale(0.98)' : 'scale(1)'
+            }}>
+            FAST ▼▼▼
           </button>
         </div>
       </div>
