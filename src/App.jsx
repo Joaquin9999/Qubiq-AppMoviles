@@ -454,17 +454,65 @@ function App() {
           </div>
         </div>
 
-        {/* Espacio reservado para controles (botones direccionales y rotación) */}
+        {/* Controles */}
         <div style={{
-          height: '100px',
+          width: '100%',
+          maxWidth: '350px',
           display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: "'Press Start 2P', cursive",
-          fontSize: '10px',
-          color: colors.textSecondary
+          padding: '0 20px'
         }}>
-          {/* Los controles irán aquí */}
+          {/* Flechas de movimiento (Izquierda y Derecha) */}
+          <div style={{
+            display: 'flex',
+            gap: '15px',
+            alignItems: 'center'
+          }}>
+            {/* Flecha Izquierda */}
+            <button style={{
+              width: '80px',
+              height: '80px',
+              backgroundColor: colors.panel,
+              border: `3px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '40px',
+              cursor: 'pointer',
+              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}>
+              ◄
+            </button>
+
+            {/* Flecha Derecha */}
+            <button style={{
+              width: '80px',
+              height: '80px',
+              backgroundColor: colors.panel,
+              border: `3px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '40px',
+              cursor: 'pointer',
+              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}>
+              ►
+            </button>
+          </div>
+
+          {/* Espacio para otros controles (rotación, etc.) */}
+          <div style={{
+            width: '80px',
+            height: '80px'
+          }}>
+            {/* Aquí irá el botón de rotación u otros controles */}
+          </div>
         </div>
       </div>
     )
