@@ -368,3 +368,111 @@ export const getGhostPiece = (piece, board) => {
   const { piece: ghostPiece } = hardDrop(piece, board);
   return ghostPiece;
 };
+
+// ============================================
+// PASO 5: COLOCAR PIEZAS Y LÍNEAS COMPLETAS
+// ============================================
+
+// Colocar la pieza actual en el tablero
+export const placePiece = (piece, board) => {
+  // Crear una copia del tablero
+  const newBoard = board.map(row => [...row]);
+  const coordinates = getPieceCoordinates(piece);
+  
+  // Colocar cada bloque de la pieza en el tablero
+  for (let coord of coordinates) {
+    const { x, y } = coord;
+    if (y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH) {
+      // Guardar el color de la pieza en el tablero
+      newBoard[y][x] = piece.color;
+    }
+  }
+  
+  return newBoard;
+};
+
+// Verificar si una línea está completa
+const isLineComplete = (line) => {
+  return line.every(cell => cell !== 0);
+};
+
+// Detectar y eliminar líneas completas
+export const clearLines = (board) => {
+  let newBoard = [...board];
+  let linesCleared = 0;
+  
+  // Recorrer desde abajo hacia arriba
+  for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+    if (isLineComplete(newBoard[y])) {
+      // Eliminar la línea completa
+      newBoard.splice(y, 1);
+      // Agregar una línea vacía al principio
+      newBoard.unshift(Array(BOARD_WIDTH).fill(0));
+      linesCleared++;
+      // Volver a verificar esta fila (porque bajó una nueva)
+      y++;
+    }
+  }
+  
+  return { board: newBoard, linesCleared };
+};
+
+// Calcular puntos según líneas eliminadas (sistema original de Tetris)
+export const calculateScore = (linesCleared, level) => {
+  const baseScores = {
+    1: 100,   // Single
+    2: 300,   // Double
+    3: 500,   // Triple
+    4: 800    // Tetris
+  };
+  
+  return (baseScores[linesCleared] || 0) * level;
+};
+
+// Calcular el nivel según las líneas completadas
+export const calculateLevel = (totalLines) => {
+  return Math.floor(totalLines / 10) + 1;
+};
+
+// Obtener la velocidad de caída según el nivel (en milisegundos)
+export const getDropSpeed = (level) => {
+  // Fórmula del Tetris original
+  const baseSpeed = 1000; // 1 segundo en nivel 1
+  const speedDecrease = 50; // Disminuye 50ms por nivel
+  const minSpeed = 100; // Velocidad mínima
+  
+  return Math.max(minSpeed, baseSpeed - (level - 1) * speedDecrease);
+};
+
+// Verificar si el juego ha terminado (Game Over)
+export const isGameOver = (piece, board) => {
+  // Si la pieza nueva colisiona al aparecer, es Game Over
+  return checkCollision(piece, board);
+};
+
+// Procesar el lock de una pieza (colocar y verificar líneas)
+export const lockPiece = (piece, board, currentScore, currentLevel, currentLines) => {
+  // Colocar la pieza en el tablero
+  const newBoard = placePiece(piece, board);
+  
+  // Verificar y eliminar líneas completas
+  const { board: clearedBoard, linesCleared } = clearLines(newBoard);
+  
+  // Calcular nueva puntuación
+  const scoreGained = calculateScore(linesCleared, currentLevel);
+  const newScore = currentScore + scoreGained;
+  
+  // Actualizar líneas totales
+  const newTotalLines = currentLines + linesCleared;
+  
+  // Calcular nuevo nivel
+  const newLevel = calculateLevel(newTotalLines);
+  
+  return {
+    board: clearedBoard,
+    score: newScore,
+    level: newLevel,
+    lines: newTotalLines,
+    linesCleared
+  };
+};
