@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { House, Trophy, GameController, Question } from 'phosphor-react'
+import { House, Trophy, GameController, Question, Pause, Play, ArrowCounterClockwise } from 'phosphor-react'
 import logo from './assets/logo.png'
 import {
   startGame,
@@ -81,6 +81,13 @@ function App() {
     setGameState(newGame)
   }
 
+  // Iniciar juego cuando se entra a la vista de juego
+  useEffect(() => {
+    if (currentView === 'game' && !gameState) {
+      initGame()
+    }
+  }, [currentView])
+
   // Loop del juego - Caída automática
   useEffect(() => {
     if (!gameState || gameState.gameState !== GAME_STATES.PLAYING) {
@@ -109,6 +116,24 @@ function App() {
     if (!gameState || gameState.gameState !== GAME_STATES.PLAYING) return
     
     setGameState(prevState => handlePlayerAction(action, prevState))
+  }
+
+  // Pausar/Reanudar el juego
+  const togglePause = () => {
+    if (!gameState) return
+    
+    setGameState(prevState => ({
+      ...prevState,
+      gameState: prevState.gameState === GAME_STATES.PLAYING 
+        ? GAME_STATES.PAUSED 
+        : GAME_STATES.PLAYING
+    }))
+  }
+
+  // Reiniciar el juego
+  const restartGame = () => {
+    setIsFastMode(false)
+    initGame()
   }
 
   // Renderizar el tablero
@@ -309,6 +334,9 @@ function App() {
 
   // HOME - Vista del menú principal
   if (currentView === 'menu') {
+    // Verificar si hay una partida en pausa
+    const hasGameInProgress = gameState && gameState.gameState === GAME_STATES.PAUSED
+
     return (
       <div style={{ 
         height: '100vh', 
@@ -340,13 +368,13 @@ function App() {
             <button 
               style={{
                 ...buttonStyle,
-                backgroundColor: hoveredButton === 'play' ? colors.primary : colors.panel,
-                borderColor: hoveredButton === 'play' ? colors.hover : colors.border,
-                boxShadow: hoveredButton === 'play' 
+                backgroundColor: (hoveredButton === 'play' || hasGameInProgress) ? colors.primary : colors.panel,
+                borderColor: (hoveredButton === 'play' || hasGameInProgress) ? colors.hover : colors.border,
+                boxShadow: (hoveredButton === 'play' || hasGameInProgress)
                   ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
                   : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
-                transform: hoveredButton === 'play' ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-                animation: hoveredButton === 'play' ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.5s ease-out',
+                transform: (hoveredButton === 'play' || hasGameInProgress) ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                animation: (hoveredButton === 'play' || hasGameInProgress) ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.5s ease-out',
                 animationDelay: '0s'
               }}
               onClick={() => setCurrentView('game')}
@@ -354,7 +382,7 @@ function App() {
               onMouseLeave={() => setHoveredButton(null)}
             >
               <GameController size={20} weight="fill" style={{ marginRight: '12px', display: 'inline-block', verticalAlign: 'middle' }} />
-              PLAY
+              {hasGameInProgress ? 'CONTINUE' : 'PLAY'}
             </button>
 
             <button 
@@ -404,11 +432,6 @@ function App() {
 
   // GAME - Vista del juego
   if (currentView === 'game') {
-    // Iniciar el juego si no existe
-    if (!gameState) {
-      initGame()
-    }
-
     // Verificar si el juego terminó
     const isGameOver = gameState && gameState.gameState === GAME_STATES.GAME_OVER
 
@@ -522,6 +545,69 @@ function App() {
             filter: `drop-shadow(0 0 15px ${colors.border})`
           }} 
         />
+
+        {/* Botones de Control - Pausa y Reinicio */}
+        <div style={{
+          position: 'absolute',
+          top: '30px',
+          right: '30px',
+          display: 'flex',
+          gap: '8px'
+        }}>
+          {/* Botón Pausa/Reanudar */}
+          <button 
+            style={{
+              width: '45px',
+              height: '45px',
+              backgroundColor: hoveredButton === 'pause' ? colors.accent : colors.panel,
+              border: `3px solid ${colors.border}`,
+              borderRadius: '0px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '0',
+              transition: 'all 0.2s ease',
+              boxShadow: hoveredButton === 'pause' 
+                ? `0 0 20px ${colors.hover}, inset 0 0 12px ${colors.hover}30` 
+                : `0 0 15px ${colors.border}80, inset 0 0 8px ${colors.border}20`
+            }}
+            onClick={togglePause}
+            onMouseEnter={() => setHoveredButton('pause')}
+            onMouseLeave={() => setHoveredButton(null)}
+          >
+            {gameState?.gameState === GAME_STATES.PAUSED ? (
+              <Play size={24} weight="fill" color={colors.textPrimary} />
+            ) : (
+              <Pause size={24} weight="fill" color={colors.textPrimary} />
+            )}
+          </button>
+
+          {/* Botón Reiniciar */}
+          <button 
+            style={{
+              width: '45px',
+              height: '45px',
+              backgroundColor: hoveredButton === 'restart' ? colors.warning : colors.panel,
+              border: `3px solid ${colors.border}`,
+              borderRadius: '0px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: '0',
+              transition: 'all 0.2s ease',
+              boxShadow: hoveredButton === 'restart' 
+                ? `0 0 20px ${colors.hover}, inset 0 0 12px ${colors.hover}30` 
+                : `0 0 15px ${colors.border}80, inset 0 0 8px ${colors.border}20`
+            }}
+            onClick={restartGame}
+            onMouseEnter={() => setHoveredButton('restart')}
+            onMouseLeave={() => setHoveredButton(null)}
+          >
+            <ArrowCounterClockwise size={24} weight="bold" color={colors.textPrimary} />
+          </button>
+        </div>
 
         {/* Marcador Superior */}
         <div style={{
@@ -705,6 +791,142 @@ function App() {
             FAST ▼▼▼
           </button>
         </div>
+
+        {/* Overlay de Pausa */}
+        {gameState?.gameState === GAME_STATES.PAUSED && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999,
+            animation: 'fadeIn 0.2s ease-in'
+          }}>
+            <div style={{
+              backgroundColor: colors.panel,
+              border: `6px solid ${colors.accent}`,
+              padding: '35px 45px',
+              boxShadow: `0 0 40px ${colors.accent}, inset 0 0 20px ${colors.accent}30`,
+              textAlign: 'center',
+              animation: 'popIn 0.3s ease-out',
+              maxWidth: '90%'
+            }}>
+              <h2 style={{
+                fontSize: '28px',
+                color: colors.accent,
+                fontFamily: "'Press Start 2P', cursive",
+                letterSpacing: '3px',
+                marginBottom: '30px',
+                textShadow: `0 0 20px ${colors.accent}`,
+                animation: 'pulse 2s ease-in-out infinite'
+              }}>
+                PAUSED
+              </h2>
+
+              {/* Grid decorativo */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 25px)',
+                gap: '5px',
+                marginBottom: '30px',
+                justifyContent: 'center'
+              }}>
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} style={{
+                    width: '25px',
+                    height: '6px',
+                    backgroundColor: colors.panel,
+                    border: `2px solid ${colors.accent}`,
+                    boxShadow: `0 0 8px ${colors.accent}60`
+                  }} />
+                ))}
+              </div>
+
+              {/* Botones */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                width: '100%'
+              }}>
+                {/* Botón Reanudar */}
+                <button
+                  onClick={togglePause}
+                  style={{
+                    width: '100%',
+                    padding: '15px 20px',
+                    backgroundColor: colors.panel,
+                    border: `4px solid ${colors.border}`,
+                    color: colors.textPrimary,
+                    fontSize: '11px',
+                    fontFamily: "'Press Start 2P', cursive",
+                    cursor: 'pointer',
+                    boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+                    letterSpacing: '2px',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.accent
+                    e.target.style.borderColor = colors.hover
+                    e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = colors.panel
+                    e.target.style.borderColor = colors.border
+                    e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`
+                  }}
+                >
+                  <Play size={16} weight="fill" />
+                  RESUME
+                </button>
+
+                {/* Botón Volver al Menú */}
+                <button
+                  onClick={() => setCurrentView('menu')}
+                  style={{
+                    width: '100%',
+                    padding: '15px 20px',
+                    backgroundColor: colors.panel,
+                    border: `4px solid ${colors.border}`,
+                    color: colors.textPrimary,
+                    fontSize: '11px',
+                    fontFamily: "'Press Start 2P', cursive",
+                    cursor: 'pointer',
+                    boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+                    letterSpacing: '2px',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = colors.secondary
+                    e.target.style.borderColor = colors.hover
+                    e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = colors.panel
+                    e.target.style.borderColor = colors.border
+                    e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`
+                  }}
+                >
+                  <House size={16} weight="fill" />
+                  MENU
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pop-up de Game Over */}
         {isGameOver && (
