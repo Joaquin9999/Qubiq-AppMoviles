@@ -268,39 +268,61 @@ function App() {
 
   // GAME - Vista del juego
   if (currentView === 'game') {
-    // Estilo para los paneles del marcador
-    const scorePanel = {
+    // Estilo base para los paneles del marcador
+    const scorePanelBase = {
       backgroundColor: colors.panel,
-      border: `3px solid ${colors.border}`,
-      padding: '12px 18px',
-      minWidth: '100px',
+      border: `2px solid ${colors.border}`,
       textAlign: 'center',
-      boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+      boxShadow: `0 0 10px ${colors.border}80, inset 0 0 8px ${colors.border}20`,
       fontFamily: "'Press Start 2P', cursive"
     }
 
+    // Panel pequeño para Level
+    const levelPanel = {
+      ...scorePanelBase,
+      padding: '8px 10px',
+      flex: '0 0 auto',
+      minWidth: '60px'
+    }
+
+    // Panel mediano para Score
+    const scorePanel = {
+      ...scorePanelBase,
+      padding: '8px 12px',
+      flex: '1',
+      minWidth: '100px'
+    }
+
+    // Panel para Next
+    const nextPanel = {
+      ...scorePanelBase,
+      padding: '8px 10px',
+      flex: '0 0 auto',
+      minWidth: '80px'
+    }
+
     const scoreLabelStyle = {
-      fontSize: '8px',
+      fontSize: '7px',
       color: colors.textSecondary,
-      marginBottom: '8px',
-      letterSpacing: '1px'
+      marginBottom: '6px',
+      letterSpacing: '0.5px'
     }
 
     const scoreValueStyle = {
-      fontSize: '20px',
+      fontSize: '16px',
       color: colors.textPrimary,
-      textShadow: `0 0 10px ${colors.hover}, 0 0 15px ${colors.hover}`,
-      letterSpacing: '2px'
+      textShadow: `0 0 8px ${colors.hover}, 0 0 12px ${colors.hover}`,
+      letterSpacing: '1px'
     }
 
     const nextPreviewStyle = {
-      width: '35px',
-      height: '35px',
+      width: '26px',
+      height: '26px',
       backgroundColor: colors.disabled,
       border: `2px solid ${colors.border}`,
-      boxShadow: `inset 0 0 10px ${colors.background}, 0 0 8px ${colors.border}60`,
+      boxShadow: `inset 0 0 8px ${colors.background}, 0 0 6px ${colors.border}60`,
       display: 'inline-block',
-      margin: '2px'
+      margin: '1px'
     }
 
     return (
@@ -333,15 +355,16 @@ function App() {
         {/* Marcador Superior */}
         <div style={{
           display: 'flex',
-          gap: '8px',
+          gap: '6px',
           marginTop: '80px',
           marginBottom: '20px',
           justifyContent: 'center',
           width: '100%',
-          maxWidth: '400px'
+          maxWidth: '100%',
+          padding: '0 5px'
         }}>
           {/* Panel Level */}
-          <div style={scorePanel}>
+          <div style={levelPanel}>
             <div style={scoreLabelStyle}>LEVEL</div>
             <div style={scoreValueStyle}>{level}</div>
           </div>
@@ -350,6 +373,24 @@ function App() {
           <div style={scorePanel}>
             <div style={scoreLabelStyle}>SCORE</div>
             <div style={scoreValueStyle}>{score}</div>
+          </div>
+
+          {/* Panel Next */}
+          <div style={nextPanel}>
+            <div style={scoreLabelStyle}>NEXT</div>
+            <div style={{ marginTop: '6px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '2px',
+                justifyContent: 'center',
+                maxWidth: '56px',
+                margin: '0 auto'
+              }}>
+                <div style={nextPreviewStyle}></div>
+                <div style={nextPreviewStyle}></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
