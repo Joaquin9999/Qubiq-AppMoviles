@@ -1,0 +1,283 @@
+import { House, Pause, Play, ArrowCounterClockwise } from 'phosphor-react';
+import { colors } from '../styles/colors';
+import { GAME_STATES } from '../tetrisLogic';
+import IconButton from '../components/IconButton';
+import ScorePanel from '../components/ScorePanel';
+import GameBoard from '../components/GameBoard';
+import NextPiecePreview from '../components/NextPiecePreview';
+import PauseModal from './modals/PauseModal';
+import GameOverModal from './modals/GameOverModal';
+import logo from '../assets/logo.png';
+
+/**
+ * Vista principal del juego
+ */
+const GameView = ({ 
+  gameState,
+  hoveredButton,
+  setHoveredButton,
+  isFastMode,
+  setIsFastMode,
+  onNavigate,
+  onPause,
+  onRestart,
+  onControl
+}) => {
+  if (!gameState) return null;
+
+  const isGameOver = gameState.gameState === GAME_STATES.GAME_OVER;
+  const isPaused = gameState.gameState === GAME_STATES.PAUSED;
+
+  return (
+    <div style={{ 
+      height: '100vh', 
+      maxHeight: '100vh',
+      backgroundColor: colors.background, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      paddingTop: '100px',
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
+      {/* Botón Home */}
+      <IconButton
+        size="large"
+        variant="secondary"
+        isHovered={hoveredButton === 'home-game'}
+        onClick={() => {
+          // Pausar el juego antes de ir al menú
+          if (gameState.gameState === GAME_STATES.PLAYING) {
+            onPause();
+          }
+          onNavigate('menu');
+        }}
+        onMouseEnter={() => setHoveredButton('home-game')}
+        onMouseLeave={() => setHoveredButton(null)}
+        position={{ top: '30px', left: '30px' }}
+      >
+        <House size={32} weight="bold" color={colors.textPrimary} />
+      </IconButton>
+
+      {/* Logo */}
+      <img 
+        src={logo} 
+        alt="TETRIS" 
+        style={{ 
+          position: 'absolute',
+          top: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '150px',
+          maxWidth: '50vw',
+          height: 'auto',
+          imageRendering: 'pixelated',
+          filter: `drop-shadow(0 0 15px ${colors.border})`
+        }} 
+      />
+
+      {/* Botones de Control - Pausa y Reinicio */}
+      <div style={{
+        position: 'absolute',
+        top: '30px',
+        right: '30px',
+        display: 'flex',
+        gap: '8px'
+      }}>
+        <IconButton
+          size="small"
+          variant="accent"
+          isHovered={hoveredButton === 'pause'}
+          onClick={onPause}
+          onMouseEnter={() => setHoveredButton('pause')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          {isPaused ? (
+            <Play size={24} weight="fill" color={colors.textPrimary} />
+          ) : (
+            <Pause size={24} weight="fill" color={colors.textPrimary} />
+          )}
+        </IconButton>
+
+        <IconButton
+          size="small"
+          variant="warning"
+          isHovered={hoveredButton === 'restart'}
+          onClick={onRestart}
+          onMouseEnter={() => setHoveredButton('restart')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <ArrowCounterClockwise size={24} weight="bold" color={colors.textPrimary} />
+        </IconButton>
+      </div>
+
+      {/* Marcador Superior */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '10px',
+        marginTop: '5px',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: '100%',
+        padding: '0 10px'
+      }}>
+        <ScorePanel type="small" label="LEVEL" value={gameState.level} />
+        
+        <ScorePanel type="next" label="NEXT">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '3px',
+            justifyContent: 'center'
+          }}>
+            <NextPiecePreview nextPiece={gameState.nextPiece} />
+          </div>
+        </ScorePanel>
+
+        <ScorePanel type="small" label="SCORE" value={gameState.score} />
+      </div>
+
+      {/* Game Board */}
+      <GameBoard gameState={gameState} />
+
+      {/* Controles */}
+      <div style={{
+        width: '100%',
+        maxWidth: '350px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0 20px'
+      }}>
+        {/* Flechas de movimiento */}
+        <div style={{
+          display: 'flex',
+          gap: '15px',
+          alignItems: 'center'
+        }}>
+          <button 
+            onClick={() => onControl('MOVE_LEFT')}
+            style={{
+              width: '80px',
+              height: '80px',
+              backgroundColor: colors.panel,
+              border: `3px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '40px',
+              cursor: 'pointer',
+              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}>
+            ◄
+          </button>
+
+          <button 
+            onClick={() => onControl('MOVE_RIGHT')}
+            style={{
+              width: '80px',
+              height: '80px',
+              backgroundColor: colors.panel,
+              border: `3px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '40px',
+              cursor: 'pointer',
+              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}>
+            ►
+          </button>
+        </div>
+
+        {/* Botón de Rotación */}
+        <button 
+          onClick={() => onControl('ROTATE')}
+          style={{
+            flex: '1',
+            height: '80px',
+            backgroundColor: colors.panel,
+            border: `3px solid ${colors.border}`,
+            color: colors.textPrimary,
+            fontSize: '10px',
+            fontFamily: "'Press Start 2P', cursive",
+            cursor: 'pointer',
+            boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            transition: 'all 0.2s ease',
+            letterSpacing: '1px',
+            marginLeft: '15px'
+          }}>
+          <div style={{ fontSize: '28px' }}>↻</div>
+          <div>ROTATE</div>
+        </button>
+      </div>
+
+      {/* Botón FAST */}
+      <div style={{
+        width: '100%',
+        maxWidth: '350px',
+        padding: '0 20px',
+        marginTop: '15px'
+      }}>
+        <button 
+          onMouseDown={() => setIsFastMode(true)}
+          onMouseUp={() => setIsFastMode(false)}
+          onMouseLeave={() => setIsFastMode(false)}
+          onTouchStart={() => setIsFastMode(true)}
+          onTouchEnd={() => setIsFastMode(false)}
+          style={{
+            width: '100%',
+            height: '50px',
+            backgroundColor: isFastMode ? colors.warning : colors.panel,
+            border: `3px solid ${isFastMode ? colors.hover : colors.border}`,
+            color: colors.textPrimary,
+            fontSize: '14px',
+            fontFamily: "'Press Start 2P', cursive",
+            cursor: 'pointer',
+            boxShadow: isFastMode 
+              ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}40` 
+              : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.1s ease',
+            letterSpacing: '3px',
+            transform: isFastMode ? 'scale(0.98)' : 'scale(1)'
+          }}>
+          FAST ▼▼▼
+        </button>
+      </div>
+
+      {/* Modales */}
+      {isPaused && (
+        <PauseModal 
+          onResume={onPause}
+          onMenu={() => onNavigate('menu')}
+        />
+      )}
+
+      {isGameOver && (
+        <GameOverModal 
+          score={gameState.score}
+          level={gameState.level}
+          onMenu={() => onNavigate('menu')}
+        />
+      )}
+    </div>
+  );
+};
+
+export default GameView;
