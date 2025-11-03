@@ -522,7 +522,16 @@ function App() {
             borderColor: hoveredButton === 'home-game' ? colors.hover : colors.border,
             boxShadow: hoveredButton === 'home-game' ? `0 0 20px ${colors.hover}` : `0 0 15px ${colors.border}60`
           }}
-          onClick={() => setCurrentView('menu')}
+          onClick={() => {
+            // Pausar el juego antes de ir al menú
+            if (gameState && gameState.gameState === GAME_STATES.PLAYING) {
+              setGameState(prevState => ({
+                ...prevState,
+                gameState: GAME_STATES.PAUSED
+              }))
+            }
+            setCurrentView('menu')
+          }}
           onMouseEnter={() => setHoveredButton('home-game')}
           onMouseLeave={() => setHoveredButton(null)}
         >
