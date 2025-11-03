@@ -3,17 +3,39 @@ import { House, Trophy, GameController, Question } from 'phosphor-react'
 
 function App() {
   const [currentView, setCurrentView] = useState('splash')
+  const [hoveredButton, setHoveredButton] = useState(null)
+
+  // Paleta de colores
+  const colors = {
+    background: '#0A0A0A',        // Negro profundo
+    panel: '#1B1C1E',             // Azul grisáceo oscuro
+    border: '#B026FF',            // Púrpura neón vibrante
+    primary: '#FF595E',           // Rojo coral
+    secondary: '#1982C4',         // Azul neón
+    hover: '#00FFFF',             // Cian brillante
+    disabled: '#555A60',          // Gris metálico
+    textPrimary: '#FFFFFF',       // Blanco puro
+    textSecondary: '#C5C6C7',     // Gris claro
+    accent: '#FF7A00',            // Naranja vibrante
+    warning: '#FF1053'            // Rosa neón
+  }
 
   const buttonStyle = {
     width: '100%',
-    padding: '18px 0',
-    backgroundColor: 'white',
-    border: '3px solid black',
-    borderRadius: '50px',
-    fontSize: '18px',
+    padding: '18px 20px',
+    backgroundColor: colors.panel,
+    border: `4px solid ${colors.border}`,
+    borderRadius: '0px',
+    fontSize: '14px',
     fontWeight: 'normal',
     cursor: 'pointer',
-    color: 'black'
+    color: colors.textPrimary,
+    transition: 'all 0.1s ease',
+    boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+    fontFamily: "'Press Start 2P', cursive",
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    imageRendering: 'pixelated'
   }
 
   const homeButtonStyle = {
@@ -22,14 +44,16 @@ function App() {
     left: '30px',
     width: '60px',
     height: '60px',
-    backgroundColor: 'white',
-    border: '3px solid black',
-    borderRadius: '50%',
+    backgroundColor: colors.panel,
+    border: `4px solid ${colors.border}`,
+    borderRadius: '0px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    padding: '0'
+    padding: '0',
+    transition: 'all 0.1s ease',
+    boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`
   }
 
   const handleSplashClick = () => {
@@ -44,7 +68,7 @@ function App() {
         style={{ 
           height: '100vh', 
           maxHeight: '100vh',
-          backgroundColor: 'white', 
+          backgroundColor: colors.background, 
           display: 'flex', 
           flexDirection: 'column', 
           alignItems: 'center', 
@@ -53,22 +77,83 @@ function App() {
           overflow: 'hidden',
           cursor: 'pointer'
         }}>
-        <h1 style={{ 
-          fontSize: '72px', 
-          fontWeight: 'bold', 
-          textAlign: 'center',
-          color: 'black',
-          marginBottom: '20px',
-          animation: 'fadeIn 1s ease-in'
+        {/* Marco retro tipo tablero de Tetris */}
+        <div style={{
+          border: `6px solid ${colors.border}`,
+          padding: '40px 60px',
+          backgroundColor: colors.background,
+          boxShadow: `0 0 30px ${colors.border}, inset 0 0 20px ${colors.border}30`,
+          position: 'relative'
         }}>
-          TETRIS
-        </h1>
+          {/* Grid decorativo superior */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7, 40px)',
+            gap: '8px',
+            marginBottom: '30px',
+            justifyContent: 'center'
+          }}>
+            {[...Array(7)].map((_, i) => (
+              <div key={i} style={{
+                width: '40px',
+                height: '10px',
+                backgroundColor: colors.panel,
+                border: `2px solid ${colors.border}`,
+                boxShadow: `0 0 8px ${colors.border}60`
+              }} />
+            ))}
+          </div>
+
+          <h1 style={{ 
+            fontSize: '48px', 
+            fontWeight: 'normal', 
+            textAlign: 'center',
+            color: colors.textPrimary,
+            marginBottom: '30px',
+            animation: 'fadeIn 1s ease-in',
+            textShadow: `
+              3px 3px 0px ${colors.primary},
+              6px 6px 0px ${colors.accent},
+              9px 9px 0px ${colors.secondary},
+              0 0 20px ${colors.border}
+            `,
+            fontFamily: "'Press Start 2P', cursive",
+            letterSpacing: '4px',
+            lineHeight: '1.5'
+          }}>
+            TETRIS
+          </h1>
+
+          {/* Grid decorativo inferior */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7, 40px)',
+            gap: '8px',
+            marginTop: '30px',
+            marginBottom: '20px',
+            justifyContent: 'center'
+          }}>
+            {[...Array(7)].map((_, i) => (
+              <div key={i} style={{
+                width: '40px',
+                height: '10px',
+                backgroundColor: colors.panel,
+                border: `2px solid ${colors.border}`,
+                boxShadow: `0 0 8px ${colors.border}60`
+              }} />
+            ))}
+          </div>
+        </div>
+
         <p style={{ 
-          fontSize: '18px', 
-          color: '#666',
+          fontSize: '12px', 
+          color: colors.hover,
           textAlign: 'center',
-          marginTop: '20px',
-          animation: 'pulse 2s ease-in-out infinite'
+          marginTop: '40px',
+          animation: 'pulse 2s ease-in-out infinite',
+          textShadow: `0 0 10px ${colors.hover}`,
+          fontFamily: "'Press Start 2P', cursive",
+          letterSpacing: '2px'
         }}>
           TAP TO START
         </p>
@@ -77,8 +162,9 @@ function App() {
           bottom: '40px',
           left: '50%',
           transform: 'translateX(-50%)',
-          fontSize: '12px',
-          color: '#999'
+          fontSize: '8px',
+          color: colors.textSecondary,
+          fontFamily: "'Press Start 2P', cursive"
         }}>
           v1.0.0
         </div>
@@ -92,7 +178,7 @@ function App() {
       <div style={{ 
         height: '100vh', 
         maxHeight: '100vh',
-        backgroundColor: 'white', 
+        backgroundColor: colors.background, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
@@ -102,30 +188,78 @@ function App() {
       }}>
         <div style={{ width: '100%', maxWidth: '500px' }}>
           <h1 style={{ 
-            fontSize: '56px', 
-            fontWeight: 'bold', 
+            fontSize: '36px', 
+            fontWeight: 'normal', 
             textAlign: 'center',
             marginBottom: '50px',
-            color: 'black',
-            margin: '0 0 50px 0'
+            color: colors.textPrimary,
+            margin: '0 0 50px 0',
+            textShadow: `
+              2px 2px 0px ${colors.primary},
+              4px 4px 0px ${colors.accent},
+              6px 6px 0px ${colors.secondary},
+              0 0 20px ${colors.border}
+            `,
+            fontFamily: "'Press Start 2P', cursive",
+            letterSpacing: '4px',
+            lineHeight: '1.5'
           }}>
             TETRIS
           </h1>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <button style={buttonStyle} onClick={() => setCurrentView('game')}>
-              <GameController size={24} weight="bold" style={{ marginRight: '10px', display: 'inline-block', verticalAlign: 'middle' }} />
+            <button 
+              style={{
+                ...buttonStyle,
+                backgroundColor: hoveredButton === 'play' ? colors.primary : colors.panel,
+                borderColor: hoveredButton === 'play' ? colors.hover : colors.border,
+                boxShadow: hoveredButton === 'play' 
+                  ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
+                  : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
+                transform: hoveredButton === 'play' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+              }}
+              onClick={() => setCurrentView('game')}
+              onMouseEnter={() => setHoveredButton('play')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <GameController size={20} weight="fill" style={{ marginRight: '12px', display: 'inline-block', verticalAlign: 'middle' }} />
               PLAY
             </button>
 
-            <button style={buttonStyle} onClick={() => setCurrentView('highscores')}>
-              <Trophy size={24} weight="bold" style={{ marginRight: '10px', display: 'inline-block', verticalAlign: 'middle' }} />
-              HIGH SCORES
+            <button 
+              style={{
+                ...buttonStyle,
+                backgroundColor: hoveredButton === 'scores' ? colors.secondary : colors.panel,
+                borderColor: hoveredButton === 'scores' ? colors.hover : colors.border,
+                boxShadow: hoveredButton === 'scores' 
+                  ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
+                  : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
+                transform: hoveredButton === 'scores' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+              }}
+              onClick={() => setCurrentView('highscores')}
+              onMouseEnter={() => setHoveredButton('scores')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <Trophy size={20} weight="fill" style={{ marginRight: '12px', display: 'inline-block', verticalAlign: 'middle' }} />
+              SCORES
             </button>
 
-            <button style={buttonStyle} onClick={() => setCurrentView('instructions')}>
-              <Question size={24} weight="bold" style={{ marginRight: '10px', display: 'inline-block', verticalAlign: 'middle' }} />
-              INSTRUCTIONS
+            <button 
+              style={{
+                ...buttonStyle,
+                backgroundColor: hoveredButton === 'instructions' ? colors.secondary : colors.panel,
+                borderColor: hoveredButton === 'instructions' ? colors.hover : colors.border,
+                boxShadow: hoveredButton === 'instructions' 
+                  ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
+                  : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
+                transform: hoveredButton === 'instructions' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+              }}
+              onClick={() => setCurrentView('instructions')}
+              onMouseEnter={() => setHoveredButton('instructions')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <Question size={20} weight="fill" style={{ marginRight: '12px', display: 'inline-block', verticalAlign: 'middle' }} />
+              HELP
             </button>
           </div>
         </div>
@@ -139,7 +273,7 @@ function App() {
       <div style={{ 
         height: '100vh', 
         maxHeight: '100vh',
-        backgroundColor: 'white', 
+        backgroundColor: colors.background, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
@@ -148,15 +282,32 @@ function App() {
         overflow: 'hidden',
         position: 'relative'
       }}>
-        <button style={homeButtonStyle} onClick={() => setCurrentView('menu')}>
-          <House size={32} weight="bold" color="black" />
+        <button 
+          style={{
+            ...homeButtonStyle,
+            backgroundColor: hoveredButton === 'home-game' ? colors.secondary : colors.panel,
+            borderColor: hoveredButton === 'home-game' ? colors.hover : colors.border,
+            boxShadow: hoveredButton === 'home-game' ? `0 0 20px ${colors.hover}` : `0 0 15px ${colors.border}60`
+          }}
+          onClick={() => setCurrentView('menu')}
+          onMouseEnter={() => setHoveredButton('home-game')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <House size={32} weight="bold" color={colors.textPrimary} />
         </button>
 
         <h1 style={{ 
-          fontSize: '48px', 
-          fontWeight: 'bold', 
+          fontSize: '32px', 
+          fontWeight: 'normal', 
           textAlign: 'center',
-          color: 'black'
+          color: colors.textPrimary,
+          textShadow: `
+            2px 2px 0px ${colors.primary},
+            4px 4px 0px ${colors.accent},
+            0 0 20px ${colors.primary}
+          `,
+          fontFamily: "'Press Start 2P', cursive",
+          letterSpacing: '3px'
         }}>
           GAME
         </h1>
@@ -170,7 +321,7 @@ function App() {
       <div style={{ 
         height: '100vh', 
         maxHeight: '100vh',
-        backgroundColor: 'white', 
+        backgroundColor: colors.background, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
@@ -179,17 +330,35 @@ function App() {
         overflow: 'hidden',
         position: 'relative'
       }}>
-        <button style={homeButtonStyle} onClick={() => setCurrentView('menu')}>
-          <House size={32} weight="bold" color="black" />
+        <button 
+          style={{
+            ...homeButtonStyle,
+            backgroundColor: hoveredButton === 'home-scores' ? colors.secondary : colors.panel,
+            borderColor: hoveredButton === 'home-scores' ? colors.hover : colors.border,
+            boxShadow: hoveredButton === 'home-scores' ? `0 0 20px ${colors.hover}` : `0 0 15px ${colors.border}60`
+          }}
+          onClick={() => setCurrentView('menu')}
+          onMouseEnter={() => setHoveredButton('home-scores')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <House size={32} weight="bold" color={colors.textPrimary} />
         </button>
 
         <h1 style={{ 
-          fontSize: '48px', 
-          fontWeight: 'bold', 
+          fontSize: '28px', 
+          fontWeight: 'normal', 
           textAlign: 'center',
-          color: 'black'
+          color: colors.textPrimary,
+          textShadow: `
+            2px 2px 0px ${colors.accent},
+            4px 4px 0px ${colors.secondary},
+            0 0 20px ${colors.accent}
+          `,
+          fontFamily: "'Press Start 2P', cursive",
+          letterSpacing: '2px',
+          lineHeight: '1.5'
         }}>
-          HIGH SCORES
+          HIGH<br/>SCORES
         </h1>
       </div>
     )
@@ -201,7 +370,7 @@ function App() {
       <div style={{ 
         height: '100vh', 
         maxHeight: '100vh',
-        backgroundColor: 'white', 
+        backgroundColor: colors.background, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center',
@@ -210,17 +379,35 @@ function App() {
         overflow: 'hidden',
         position: 'relative'
       }}>
-        <button style={homeButtonStyle} onClick={() => setCurrentView('menu')}>
-          <House size={32} weight="bold" color="black" />
+        <button 
+          style={{
+            ...homeButtonStyle,
+            backgroundColor: hoveredButton === 'home-instructions' ? colors.secondary : colors.panel,
+            borderColor: hoveredButton === 'home-instructions' ? colors.hover : colors.border,
+            boxShadow: hoveredButton === 'home-instructions' ? `0 0 20px ${colors.hover}` : `0 0 15px ${colors.border}60`
+          }}
+          onClick={() => setCurrentView('menu')}
+          onMouseEnter={() => setHoveredButton('home-instructions')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <House size={32} weight="bold" color={colors.textPrimary} />
         </button>
 
         <h1 style={{ 
-          fontSize: '48px', 
-          fontWeight: 'bold', 
+          fontSize: '24px', 
+          fontWeight: 'normal', 
           textAlign: 'center',
-          color: 'black'
+          color: colors.textPrimary,
+          textShadow: `
+            2px 2px 0px ${colors.secondary},
+            4px 4px 0px ${colors.hover},
+            0 0 20px ${colors.secondary}
+          `,
+          fontFamily: "'Press Start 2P', cursive",
+          letterSpacing: '2px',
+          lineHeight: '1.5'
         }}>
-          INSTRUCTIONS
+          HOW TO<br/>PLAY
         </h1>
       </div>
     )

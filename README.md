@@ -285,16 +285,6 @@ Las contribuciones son bienvenidas. Para cambios importantes:
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 🎯 Próximas Características
-
-- [ ] Implementar la lógica del juego Tetris
-- [ ] Sistema de puntuación y high scores
-- [ ] Diferentes niveles de dificultad
-- [ ] Efectos de sonido y música
-- [ ] Modo oscuro
-- [ ] Guardado automático de progreso
-- [ ] Estadísticas de juego
-- [ ] Logros y desafíos
 
 ## 📄 Licencia
 
