@@ -429,6 +429,43 @@ function App() {
             <div style={scoreValueStyle}>{score}</div>
           </div>
         </div>
+
+        {/* Game Board */}
+        <div style={{
+          width: '320px',
+          height: '520px',
+          backgroundColor: colors.panel,
+          border: `3px solid ${colors.border}`,
+          boxShadow: `0 0 20px ${colors.border}80, inset 0 0 15px ${colors.background}`,
+          marginBottom: '15px',
+          position: 'relative'
+        }}>
+          {/* Grid del tablero */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(10, 1fr)',
+            gridTemplateRows: 'repeat(20, 1fr)',
+            width: '100%',
+            height: '100%',
+            gap: '1px',
+            padding: '2px'
+          }}>
+            {/* Aquí irán las celdas del juego */}
+          </div>
+        </div>
+
+        {/* Espacio reservado para controles (botones direccionales y rotación) */}
+        <div style={{
+          height: '100px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: "'Press Start 2P', cursive",
+          fontSize: '10px',
+          color: colors.textSecondary
+        }}>
+          {/* Los controles irán aquí */}
+        </div>
       </div>
     )
   }
