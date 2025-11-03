@@ -506,13 +506,29 @@ function App() {
             </button>
           </div>
 
-          {/* Espacio para otros controles (rotación, etc.) */}
-          <div style={{
-            width: '80px',
-            height: '80px'
+          {/* Botón de Rotación (Derecha) */}
+          <button style={{
+            flex: '1',
+            height: '80px',
+            backgroundColor: colors.panel,
+            border: `3px solid ${colors.border}`,
+            color: colors.textPrimary,
+            fontSize: '10px',
+            fontFamily: "'Press Start 2P', cursive",
+            cursor: 'pointer',
+            boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            transition: 'all 0.2s ease',
+            letterSpacing: '1px',
+            marginLeft: '15px'
           }}>
-            {/* Aquí irá el botón de rotación u otros controles */}
-          </div>
+            <div style={{ fontSize: '28px' }}>↻</div>
+            <div>ROTATE</div>
+          </button>
         </div>
       </div>
     )
