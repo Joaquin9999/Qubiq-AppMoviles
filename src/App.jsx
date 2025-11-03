@@ -31,12 +31,13 @@ function App() {
     fontWeight: 'normal',
     cursor: 'pointer',
     color: colors.textPrimary,
-    transition: 'all 0.1s ease',
+    transition: 'all 0.2s ease',
     boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
     fontFamily: "'Press Start 2P', cursive",
     letterSpacing: '2px',
     textTransform: 'uppercase',
-    imageRendering: 'pixelated'
+    imageRendering: 'pixelated',
+    animation: 'slideIn 0.5s ease-out'
   }
 
   const homeButtonStyle = {
@@ -53,8 +54,9 @@ function App() {
     justifyContent: 'center',
     cursor: 'pointer',
     padding: '0',
-    transition: 'all 0.1s ease',
-    boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`
+    transition: 'all 0.2s ease',
+    boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+    animation: 'pixelBounce 2s ease-in-out infinite'
   }
 
   const handleSplashClick = () => {
@@ -205,7 +207,9 @@ function App() {
                 boxShadow: hoveredButton === 'play' 
                   ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
                   : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
-                transform: hoveredButton === 'play' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+                transform: hoveredButton === 'play' ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                animation: hoveredButton === 'play' ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.5s ease-out',
+                animationDelay: '0s'
               }}
               onClick={() => setCurrentView('game')}
               onMouseEnter={() => setHoveredButton('play')}
@@ -223,7 +227,9 @@ function App() {
                 boxShadow: hoveredButton === 'scores' 
                   ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
                   : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
-                transform: hoveredButton === 'scores' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+                transform: hoveredButton === 'scores' ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                animation: hoveredButton === 'scores' ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.6s ease-out',
+                animationDelay: '0.1s'
               }}
               onClick={() => setCurrentView('highscores')}
               onMouseEnter={() => setHoveredButton('scores')}
@@ -241,7 +247,9 @@ function App() {
                 boxShadow: hoveredButton === 'instructions' 
                   ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}` 
                   : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
-                transform: hoveredButton === 'instructions' ? 'translate(-2px, -2px)' : 'translate(0, 0)'
+                transform: hoveredButton === 'instructions' ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                animation: hoveredButton === 'instructions' ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.7s ease-out',
+                animationDelay: '0.2s'
               }}
               onClick={() => setCurrentView('instructions')}
               onMouseEnter={() => setHoveredButton('instructions')}

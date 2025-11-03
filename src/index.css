@@ -40,6 +40,67 @@ button:active {
   box-shadow: 0 0 15px #B026FF80, inset 0 0 10px #B026FF20, 2px 2px 0px #B026FF !important;
 }
 
+/* Animación de parpadeo retro para botones */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Animación de escaneo tipo CRT */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Animación de brillo neón para botones */
+@keyframes buttonGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px #B026FF80, 
+      inset 0 0 10px #B026FF20, 
+      4px 4px 0px #B026FF;
+  }
+  50% {
+    box-shadow: 
+      0 0 25px #00FFFF, 
+      inset 0 0 15px #00FFFF30, 
+      4px 4px 0px #B026FF,
+      0 0 40px #B026FF60;
+  }
+}
+
+/* Animación de deslizamiento retro */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de rebote pixelado */
+@keyframes pixelBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-4px);
+  }
+}
+
 /* Efecto pixelado para todo */
 * {
   image-rendering: pixelated;
