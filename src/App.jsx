@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { House, Trophy, GameController, Question } from 'phosphor-react'
 
 function App() {
-  const [currentView, setCurrentView] = useState('menu')
+  const [currentView, setCurrentView] = useState('splash')
 
   const buttonStyle = {
     width: '100%',
@@ -30,6 +30,60 @@ function App() {
     justifyContent: 'center',
     cursor: 'pointer',
     padding: '0'
+  }
+
+  const handleSplashClick = () => {
+    setCurrentView('menu')
+  }
+
+  // SPLASH SCREEN - Pantalla de bienvenida
+  if (currentView === 'splash') {
+    return (
+      <div 
+        onClick={handleSplashClick}
+        style={{ 
+          height: '100vh', 
+          maxHeight: '100vh',
+          backgroundColor: 'white', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          padding: '40px',
+          overflow: 'hidden',
+          cursor: 'pointer'
+        }}>
+        <h1 style={{ 
+          fontSize: '72px', 
+          fontWeight: 'bold', 
+          textAlign: 'center',
+          color: 'black',
+          marginBottom: '20px',
+          animation: 'fadeIn 1s ease-in'
+        }}>
+          TETRIS
+        </h1>
+        <p style={{ 
+          fontSize: '18px', 
+          color: '#666',
+          textAlign: 'center',
+          marginTop: '20px',
+          animation: 'pulse 2s ease-in-out infinite'
+        }}>
+          TAP TO START
+        </p>
+        <div style={{
+          position: 'absolute',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          fontSize: '12px',
+          color: '#999'
+        }}>
+          v1.0.0
+        </div>
+      </div>
+    )
   }
 
   // HOME - Vista del menú principal
