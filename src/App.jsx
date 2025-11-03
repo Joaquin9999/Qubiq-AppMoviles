@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { House, Trophy, GameController, Question } from 'phosphor-react'
+import logo from './assets/logo.png'
 
 function App() {
   const [currentView, setCurrentView] = useState('splash')
@@ -104,25 +105,19 @@ function App() {
             ))}
           </div>
 
-          <h1 style={{ 
-            fontSize: '48px', 
-            fontWeight: 'normal', 
-            textAlign: 'center',
-            color: colors.textPrimary,
-            marginBottom: '30px',
-            animation: 'fadeIn 1s ease-in',
-            textShadow: `
-              3px 3px 0px ${colors.primary},
-              6px 6px 0px ${colors.accent},
-              9px 9px 0px ${colors.secondary},
-              0 0 20px ${colors.border}
-            `,
-            fontFamily: "'Press Start 2P', cursive",
-            letterSpacing: '4px',
-            lineHeight: '1.5'
-          }}>
-            TETRIS
-          </h1>
+          <img 
+            src={logo} 
+            alt="TETRIS" 
+            style={{ 
+              width: '300px',
+              maxWidth: '80vw',
+              height: 'auto',
+              marginBottom: '30px',
+              animation: 'fadeIn 1s ease-in',
+              imageRendering: 'pixelated',
+              filter: `drop-shadow(0 0 20px ${colors.border})`
+            }} 
+          />
 
           {/* Grid decorativo inferior */}
           <div style={{
@@ -187,25 +182,19 @@ function App() {
         overflow: 'hidden'
       }}>
         <div style={{ width: '100%', maxWidth: '500px' }}>
-          <h1 style={{ 
-            fontSize: '36px', 
-            fontWeight: 'normal', 
-            textAlign: 'center',
-            marginBottom: '50px',
-            color: colors.textPrimary,
-            margin: '0 0 50px 0',
-            textShadow: `
-              2px 2px 0px ${colors.primary},
-              4px 4px 0px ${colors.accent},
-              6px 6px 0px ${colors.secondary},
-              0 0 20px ${colors.border}
-            `,
-            fontFamily: "'Press Start 2P', cursive",
-            letterSpacing: '4px',
-            lineHeight: '1.5'
-          }}>
-            TETRIS
-          </h1>
+          <img 
+            src={logo} 
+            alt="TETRIS" 
+            style={{ 
+              width: '280px',
+              maxWidth: '70vw',
+              height: 'auto',
+              margin: '0 auto 50px auto',
+              display: 'block',
+              imageRendering: 'pixelated',
+              filter: `drop-shadow(0 0 20px ${colors.border})`
+            }} 
+          />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <button 
