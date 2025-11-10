@@ -33,6 +33,7 @@ const GameView = ({
   const [pressedButton, setPressedButton] = useState(null);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
+  const isLongPressRef = useRef(false);
 
   // Limpiar intervalos cuando el juego no está en PLAYING
   useEffect(() => {
@@ -54,20 +55,28 @@ const GameView = ({
   }, []);
 
   // Función para manejar el inicio de la presión
-  const handleButtonDown = useCallback((action) => {
+  const handleButtonDown = useCallback((action, event) => {
     // No permitir si el juego está pausado o terminado
     if (isGameOver || isPaused) return;
     
-    setPressedButton(action);
-    onControl(action); // Ejecutar inmediatamente
+    // Prevenir el comportamiento predeterminado solo para touch
+    if (event && event.type.startsWith('touch')) {
+      event.preventDefault();
+    }
     
-    // Retraso inicial antes de empezar la repetición
+    isLongPressRef.current = false;
+    setPressedButton(action);
+    
+    // Retraso para detectar si es un press largo
     timeoutRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      // Ejecutar la primera vez al empezar el long press
+      onControl(action);
       // Intervalo de repetición
       intervalRef.current = setInterval(() => {
         onControl(action);
-      }, 100); // Repetir cada 100ms
-    }, 300); // Esperar 300ms antes de empezar a repetir
+      }, 80); // Repetir cada 80ms
+    }, 400); // Esperar 400ms para considerar que es un long press
   }, [onControl, isGameOver, isPaused]);
 
   // Función para manejar el fin de la presión
@@ -81,7 +90,19 @@ const GameView = ({
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    isLongPressRef.current = false;
   }, []);
+
+  // Función para manejar el click (solo si no fue long press)
+  const handleButtonClick = useCallback((action) => {
+    // No permitir si el juego está pausado o terminado
+    if (isGameOver || isPaused) return;
+    
+    // Solo ejecutar si no fue un long press
+    if (!isLongPressRef.current) {
+      onControl(action);
+    }
+  }, [onControl, isGameOver, isPaused]);
 
   return (
     <div style={{ 
@@ -215,13 +236,11 @@ const GameView = ({
           alignItems: 'center'
         }}>
           <button 
-            onMouseDown={() => handleButtonDown('MOVE_LEFT')}
+            onClick={() => handleButtonClick('MOVE_LEFT')}
+            onMouseDown={(e) => handleButtonDown('MOVE_LEFT', e)}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              handleButtonDown('MOVE_LEFT');
-            }}
+            onTouchStart={(e) => handleButtonDown('MOVE_LEFT', e)}
             onTouchEnd={handleButtonUp}
             onTouchCancel={handleButtonUp}
             onContextMenu={(e) => e.preventDefault()}
@@ -249,13 +268,11 @@ const GameView = ({
           </button>
 
           <button 
-            onMouseDown={() => handleButtonDown('MOVE_RIGHT')}
+            onClick={() => handleButtonClick('MOVE_RIGHT')}
+            onMouseDown={(e) => handleButtonDown('MOVE_RIGHT', e)}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              handleButtonDown('MOVE_RIGHT');
-            }}
+            onTouchStart={(e) => handleButtonDown('MOVE_RIGHT', e)}
             onTouchEnd={handleButtonUp}
             onTouchCancel={handleButtonUp}
             onContextMenu={(e) => e.preventDefault()}
@@ -285,13 +302,11 @@ const GameView = ({
 
         {/* Botón de Rotación */}
         <button 
-          onMouseDown={() => handleButtonDown('ROTATE')}
+          onClick={() => handleButtonClick('ROTATE')}
+          onMouseDown={(e) => handleButtonDown('ROTATE', e)}
           onMouseUp={handleButtonUp}
           onMouseLeave={handleButtonUp}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            handleButtonDown('ROTATE');
-          }}
+          onTouchStart={(e) => handleButtonDown('ROTATE', e)}
           onTouchEnd={handleButtonUp}
           onTouchCancel={handleButtonUp}
           onContextMenu={(e) => e.preventDefault()}

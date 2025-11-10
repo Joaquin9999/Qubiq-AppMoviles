@@ -42,7 +42,10 @@ const RetroButton = ({
       ? `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30, 6px 6px 0px ${colors.border}`
       : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20, 4px 4px 0px ${colors.border}`,
     transform: (isHovered || isActive) ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-    animation: (isHovered || isActive) ? 'buttonGlow 0.8s ease-in-out infinite' : 'slideIn 0.5s ease-out',
+    animationName: (isHovered || isActive) ? 'buttonGlow' : 'slideIn',
+    animationDuration: (isHovered || isActive) ? '0.8s' : '0.5s',
+    animationTimingFunction: (isHovered || isActive) ? 'ease-in-out' : 'ease-out',
+    animationIterationCount: (isHovered || isActive) ? 'infinite' : '1',
     animationDelay,
     fontFamily: "'Press Start 2P', cursive",
     letterSpacing: '2px',

@@ -146,92 +146,71 @@ export const GAME_STATES = {
 };
 
 // ============================================
-// SISTEMA DE BOLSA DE 7 (7-BAG RANDOMIZER)
+// SISTEMA DE GENERACIÓN DE PIEZAS - "7-BAG SYSTEM"
+// Sistema del Tetris original que garantiza distribución justa
 // ============================================
 
-// Bolsa global para el sistema de generación de piezas
-let pieceBag = [];
-let pieceCounter = 0; // Contador para depuración
-let currentBagNumber = 0; // Número de bolsa actual
-
-// Mezclar array usando algoritmo Fisher-Yates
+// Mezclar array usando el algoritmo Fisher-Yates
 const shuffleArray = (array) => {
   const shuffled = [...array];
-  console.log('🔀 Antes de mezclar:', shuffled.join(', '));
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  console.log('🔀 Después de mezclar:', shuffled.join(', '));
-  // Verificar duplicados
-  const unique = new Set(shuffled);
-  if (unique.size !== shuffled.length) {
-    console.error('❌ ERROR EN SHUFFLE: Hay duplicados!', shuffled);
-  }
   return shuffled;
 };
 
-// Llenar la bolsa con las 7 piezas y mezclarlas
-const fillBag = () => {
+// Crear una nueva bolsa con las 7 piezas mezcladas
+const createNewBag = () => {
   const pieces = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-  pieceBag = shuffleArray(pieces);
-  currentBagNumber++;
-  console.log(`🎒 Bolsa #${currentBagNumber} creada:`, pieceBag.join(', '));
-  console.log(`   Verificando: ${pieceBag.length} piezas en la bolsa`);
-  // Verificar que no hay duplicados
-  const unique = [...new Set(pieceBag)];
-  if (unique.length !== 7) {
-    console.error('❌ ERROR: La bolsa tiene piezas duplicadas!', pieceBag);
-  }
+  return shuffleArray(pieces);
 };
 
-// Obtener la siguiente pieza de la bolsa
-const getPieceFromBag = () => {
-  // Si la bolsa está vacía, llenarla y mezclarla
-  if (pieceBag.length === 0) {
-    console.log('📭 Bolsa vacía, llenando nueva bolsa...');
-    fillBag();
+// Obtener la siguiente pieza de la bolsa (sistema 7-bag del Tetris original)
+// Ahora recibe y retorna la bolsa como parámetro para evitar estado compartido
+const getNextPieceFromBag = (currentBag) => {
+  let bag = [...currentBag];
+  
+  // Si la bolsa está vacía, crear una nueva
+  if (bag.length === 0) {
+    bag = createNewBag();
   }
   
-  // Sacar una pieza de la bolsa (del FINAL del array)
-  const piece = pieceBag.pop();
-  pieceCounter++;
-  console.log(`📦 Pieza #${pieceCounter} sacada: ${piece} | Quedan ${pieceBag.length} en bolsa #${currentBagNumber}: [${pieceBag.join(', ')}]`);
-  return piece;
+  // Sacar la primera pieza de la bolsa
+  const piece = bag.shift();
+  
+  return { piece, bag };
 };
 
-// Reiniciar la bolsa (útil al iniciar un nuevo juego)
-export const resetBag = () => {
-  console.log('🔄 ===== RESETEANDO BOLSA (NUEVO JUEGO) =====');
-  pieceBag = [];
-  pieceCounter = 0;
-  currentBagNumber = 0;
-  // Llenar inmediatamente con una nueva bolsa mezclada
-  fillBag();
-};
-
-// Obtener una pieza aleatoria usando el sistema de bolsa de 7
-export const getRandomTetromino = () => {
-  const randomPiece = getPieceFromBag();
+// Obtener una pieza aleatoria (sistema 7-bag del Tetris original)
+// Ahora recibe la bolsa como parámetro
+export const getRandomTetromino = (bag = []) => {
+  const { piece: randomPiece, bag: newBag } = getNextPieceFromBag(bag);
+  
   return {
-    type: randomPiece,
-    shape: TETROMINOS[randomPiece].shape[0], // Primera rotación
-    color: TETROMINOS[randomPiece].color,
-    rotation: 0,
-    x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOS[randomPiece].shape[0][0].length / 2),
-    y: 0
+    tetromino: {
+      type: randomPiece,
+      shape: TETROMINOS[randomPiece].shape[0], // Primera rotación
+      color: TETROMINOS[randomPiece].color,
+      rotation: 0,
+      x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOS[randomPiece].shape[0][0].length / 2),
+      y: 0
+    },
+    bag: newBag
   };
 };
 
 // Estado inicial del juego
 export const createInitialGameState = () => {
-  // Reiniciar la bolsa (esto también la llena automáticamente)
-  resetBag();
+  // Generar las primeras dos piezas y la bolsa inicial
+  const { tetromino: currentPiece, bag: bag1 } = getRandomTetromino([]);
+  const { tetromino: nextPiece, bag: bag2 } = getRandomTetromino(bag1);
   
   return {
     board: createEmptyBoard(),
-    currentPiece: getRandomTetromino(),
-    nextPiece: getRandomTetromino(),
+    currentPiece,
+    nextPiece,
+    pieceBag: bag2, // Guardar la bolsa en el estado del juego
     gameState: GAME_STATES.IDLE,
     score: 0,
     level: 1,
@@ -442,8 +421,6 @@ export const getGhostPiece = (piece, board) => {
 
 // Colocar la pieza actual en el tablero
 export const placePiece = (piece, board) => {
-  console.log(`🔒 Colocando pieza ${piece.type} (${piece.color}) en el tablero`);
-  
   // Crear una copia del tablero
   const newBoard = board.map(row => [...row]);
   const coordinates = getPieceCoordinates(piece);
@@ -551,19 +528,18 @@ export const lockPiece = (piece, board, currentScore, currentLevel, currentLines
 // ============================================
 
 // Generar nueva pieza y avanzar la siguiente
-export const spawnNextPiece = (nextPiece) => {
-  const newNextPiece = getRandomTetromino();
+export const spawnNextPiece = (nextPiece, currentBag) => {
+  const { tetromino: newNextPiece, bag: newBag } = getRandomTetromino(currentBag);
   
   return {
     currentPiece: nextPiece,
-    nextPiece: newNextPiece
+    nextPiece: newNextPiece,
+    pieceBag: newBag
   };
 };
 
 // Iniciar el juego
 export const startGame = () => {
-  console.log('🎮 INICIANDO NUEVO JUEGO');
-  // createInitialGameState ya resetea la bolsa internamente
   const initialState = createInitialGameState();
   
   return {
@@ -594,7 +570,7 @@ export const resetGame = () => {
 
 // Actualizar el tick del juego (caída automática)
 export const gameTick = (gameState) => {
-  const { currentPiece, board, score, level, lines, nextPiece } = gameState;
+  const { currentPiece, board, score, level, lines, nextPiece, pieceBag } = gameState;
   
   // Intentar mover la pieza hacia abajo
   const { piece: movedPiece, collided } = tryMoveDown(currentPiece, board);
@@ -610,7 +586,7 @@ export const gameTick = (gameState) => {
     const lockResult = lockPiece(currentPiece, board, score, level, lines);
     
     // Generar nueva pieza
-    const { currentPiece: newPiece, nextPiece: newNextPiece } = spawnNextPiece(nextPiece);
+    const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
     
     // Verificar si hay Game Over
     if (isGameOver(newPiece, lockResult.board)) {
@@ -627,6 +603,7 @@ export const gameTick = (gameState) => {
       board: lockResult.board,
       currentPiece: newPiece,
       nextPiece: newNextPiece,
+      pieceBag: newBag,
       score: lockResult.score,
       level: lockResult.level,
       lines: lockResult.lines
@@ -636,7 +613,7 @@ export const gameTick = (gameState) => {
 
 // Procesar hard drop (caída instantánea)
 export const processHardDrop = (gameState) => {
-  const { currentPiece, board, score, level, lines, nextPiece } = gameState;
+  const { currentPiece, board, score, level, lines, nextPiece, pieceBag } = gameState;
   
   // Dejar caer la pieza hasta el fondo
   const { piece: droppedPiece, distance } = hardDrop(currentPiece, board);
@@ -648,7 +625,7 @@ export const processHardDrop = (gameState) => {
   const lockResult = lockPiece(droppedPiece, board, score + hardDropBonus, level, lines);
   
   // Generar nueva pieza
-  const { currentPiece: newPiece, nextPiece: newNextPiece } = spawnNextPiece(nextPiece);
+  const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
   
   // Verificar si hay Game Over
   if (isGameOver(newPiece, lockResult.board)) {
@@ -665,6 +642,7 @@ export const processHardDrop = (gameState) => {
     board: lockResult.board,
     currentPiece: newPiece,
     nextPiece: newNextPiece,
+    pieceBag: newBag,
     score: lockResult.score,
     level: lockResult.level,
     lines: lockResult.lines
