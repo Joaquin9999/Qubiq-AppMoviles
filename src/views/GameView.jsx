@@ -55,14 +55,9 @@ const GameView = ({
   }, []);
 
   // Función para manejar el inicio de la presión
-  const handleButtonDown = useCallback((action, event) => {
+  const handleButtonDown = useCallback((action) => {
     // No permitir si el juego está pausado o terminado
     if (isGameOver || isPaused) return;
-    
-    // Prevenir el comportamiento predeterminado solo para touch
-    if (event && event.type.startsWith('touch')) {
-      event.preventDefault();
-    }
     
     isLongPressRef.current = false;
     setPressedButton(action);
@@ -237,13 +232,12 @@ const GameView = ({
         }}>
           <button 
             onClick={() => handleButtonClick('MOVE_LEFT')}
-            onMouseDown={(e) => handleButtonDown('MOVE_LEFT', e)}
+            onMouseDown={() => handleButtonDown('MOVE_LEFT')}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => handleButtonDown('MOVE_LEFT', e)}
+            onTouchStart={() => handleButtonDown('MOVE_LEFT')}
             onTouchEnd={handleButtonUp}
             onTouchCancel={handleButtonUp}
-            onContextMenu={(e) => e.preventDefault()}
             style={{
               width: '80px',
               height: '80px',
@@ -269,13 +263,12 @@ const GameView = ({
 
           <button 
             onClick={() => handleButtonClick('MOVE_RIGHT')}
-            onMouseDown={(e) => handleButtonDown('MOVE_RIGHT', e)}
+            onMouseDown={() => handleButtonDown('MOVE_RIGHT')}
             onMouseUp={handleButtonUp}
             onMouseLeave={handleButtonUp}
-            onTouchStart={(e) => handleButtonDown('MOVE_RIGHT', e)}
+            onTouchStart={() => handleButtonDown('MOVE_RIGHT')}
             onTouchEnd={handleButtonUp}
             onTouchCancel={handleButtonUp}
-            onContextMenu={(e) => e.preventDefault()}
             style={{
               width: '80px',
               height: '80px',
@@ -303,13 +296,12 @@ const GameView = ({
         {/* Botón de Rotación */}
         <button 
           onClick={() => handleButtonClick('ROTATE')}
-          onMouseDown={(e) => handleButtonDown('ROTATE', e)}
+          onMouseDown={() => handleButtonDown('ROTATE')}
           onMouseUp={handleButtonUp}
           onMouseLeave={handleButtonUp}
-          onTouchStart={(e) => handleButtonDown('ROTATE', e)}
+          onTouchStart={() => handleButtonDown('ROTATE')}
           onTouchEnd={handleButtonUp}
           onTouchCancel={handleButtonUp}
-          onContextMenu={(e) => e.preventDefault()}
           style={{
             flex: '1',
             height: '80px',
