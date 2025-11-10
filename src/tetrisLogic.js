@@ -151,13 +151,22 @@ export const GAME_STATES = {
 
 // Bolsa global para el sistema de generación de piezas
 let pieceBag = [];
+let pieceCounter = 0; // Contador para depuración
+let currentBagNumber = 0; // Número de bolsa actual
 
 // Mezclar array usando algoritmo Fisher-Yates
 const shuffleArray = (array) => {
   const shuffled = [...array];
+  console.log('🔀 Antes de mezclar:', shuffled.join(', '));
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  console.log('🔀 Después de mezclar:', shuffled.join(', '));
+  // Verificar duplicados
+  const unique = new Set(shuffled);
+  if (unique.size !== shuffled.length) {
+    console.error('❌ ERROR EN SHUFFLE: Hay duplicados!', shuffled);
   }
   return shuffled;
 };
@@ -166,22 +175,39 @@ const shuffleArray = (array) => {
 const fillBag = () => {
   const pieces = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
   pieceBag = shuffleArray(pieces);
+  currentBagNumber++;
+  console.log(`🎒 Bolsa #${currentBagNumber} creada:`, pieceBag.join(', '));
+  console.log(`   Verificando: ${pieceBag.length} piezas en la bolsa`);
+  // Verificar que no hay duplicados
+  const unique = [...new Set(pieceBag)];
+  if (unique.length !== 7) {
+    console.error('❌ ERROR: La bolsa tiene piezas duplicadas!', pieceBag);
+  }
 };
 
 // Obtener la siguiente pieza de la bolsa
 const getPieceFromBag = () => {
   // Si la bolsa está vacía, llenarla y mezclarla
   if (pieceBag.length === 0) {
+    console.log('📭 Bolsa vacía, llenando nueva bolsa...');
     fillBag();
   }
   
-  // Sacar una pieza de la bolsa
-  return pieceBag.pop();
+  // Sacar una pieza de la bolsa (del FINAL del array)
+  const piece = pieceBag.pop();
+  pieceCounter++;
+  console.log(`📦 Pieza #${pieceCounter} sacada: ${piece} | Quedan ${pieceBag.length} en bolsa #${currentBagNumber}: [${pieceBag.join(', ')}]`);
+  return piece;
 };
 
 // Reiniciar la bolsa (útil al iniciar un nuevo juego)
 export const resetBag = () => {
+  console.log('🔄 ===== RESETEANDO BOLSA (NUEVO JUEGO) =====');
   pieceBag = [];
+  pieceCounter = 0;
+  currentBagNumber = 0;
+  // Llenar inmediatamente con una nueva bolsa mezclada
+  fillBag();
 };
 
 // Obtener una pieza aleatoria usando el sistema de bolsa de 7
@@ -199,6 +225,9 @@ export const getRandomTetromino = () => {
 
 // Estado inicial del juego
 export const createInitialGameState = () => {
+  // Reiniciar la bolsa (esto también la llena automáticamente)
+  resetBag();
+  
   return {
     board: createEmptyBoard(),
     currentPiece: getRandomTetromino(),
@@ -413,6 +442,8 @@ export const getGhostPiece = (piece, board) => {
 
 // Colocar la pieza actual en el tablero
 export const placePiece = (piece, board) => {
+  console.log(`🔒 Colocando pieza ${piece.type} (${piece.color}) en el tablero`);
+  
   // Crear una copia del tablero
   const newBoard = board.map(row => [...row]);
   const coordinates = getPieceCoordinates(piece);
@@ -531,9 +562,8 @@ export const spawnNextPiece = (nextPiece) => {
 
 // Iniciar el juego
 export const startGame = () => {
-  // Reiniciar la bolsa para un nuevo juego
-  resetBag();
-  
+  console.log('🎮 INICIANDO NUEVO JUEGO');
+  // createInitialGameState ya resetea la bolsa internamente
   const initialState = createInitialGameState();
   
   return {

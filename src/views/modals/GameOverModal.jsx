@@ -1,10 +1,11 @@
+import { ArrowCounterClockwise, House } from 'phosphor-react';
 import { colors } from '../../styles/colors';
 import DecorativeGrid from '../../components/DecorativeGrid';
 
 /**
  * Modal de Game Over
  */
-const GameOverModal = ({ score, level, onMenu }) => {
+const GameOverModal = ({ score, level, onRestart, onMenu }) => {
   return (
     <div style={{
       position: 'fixed',
@@ -75,36 +76,81 @@ const GameOverModal = ({ score, level, onMenu }) => {
           </div>
         </div>
 
-        {/* Botón para volver al menú */}
-        <button
-          onClick={onMenu}
-          style={{
-            width: '100%',
-            padding: '15px 25px',
-            backgroundColor: colors.panel,
-            border: `4px solid ${colors.border}`,
-            color: colors.textPrimary,
-            fontSize: '12px',
-            fontFamily: "'Press Start 2P', cursive",
-            cursor: 'pointer',
-            boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
-            letterSpacing: '2px',
-            transition: 'all 0.2s ease',
-            marginTop: '10px'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = colors.primary;
-            e.target.style.borderColor = colors.hover;
-            e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = colors.panel;
-            e.target.style.borderColor = colors.border;
-            e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`;
-          }}
-        >
-          BACK TO MENU
-        </button>
+        {/* Botones */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          width: '100%'
+        }}>
+          <button
+            onClick={onRestart}
+            style={{
+              width: '100%',
+              padding: '15px 20px',
+              backgroundColor: colors.panel,
+              border: `4px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '11px',
+              fontFamily: "'Press Start 2P', cursive",
+              cursor: 'pointer',
+              boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              letterSpacing: '2px',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = colors.accent;
+              e.target.style.borderColor = colors.hover;
+              e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = colors.panel;
+              e.target.style.borderColor = colors.border;
+              e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`;
+            }}
+          >
+            <ArrowCounterClockwise size={16} weight="bold" />
+            RESTART
+          </button>
+
+          <button
+            onClick={onMenu}
+            style={{
+              width: '100%',
+              padding: '15px 20px',
+              backgroundColor: colors.panel,
+              border: `4px solid ${colors.border}`,
+              color: colors.textPrimary,
+              fontSize: '11px',
+              fontFamily: "'Press Start 2P', cursive",
+              cursor: 'pointer',
+              boxShadow: `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              letterSpacing: '2px',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = colors.secondary;
+              e.target.style.borderColor = colors.hover;
+              e.target.style.boxShadow = `0 0 25px ${colors.hover}, inset 0 0 15px ${colors.hover}30`;
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = colors.panel;
+              e.target.style.borderColor = colors.border;
+              e.target.style.boxShadow = `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`;
+            }}
+          >
+            <House size={16} weight="fill" />
+            MENU
+          </button>
+        </div>
       </div>
     </div>
   );

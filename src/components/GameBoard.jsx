@@ -8,6 +8,9 @@ const GameBoard = ({ gameState }) => {
 
   const { board, currentPiece } = gameState;
   
+  // Log para debug
+  console.log('🎨 Renderizando pieza:', currentPiece.type, 'Color:', currentPiece.color);
+  
   // Crear una copia del tablero para mostrar
   const displayBoard = board.map(row => [...row]);
   

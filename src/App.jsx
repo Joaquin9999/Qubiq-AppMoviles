@@ -24,6 +24,7 @@ function App() {
   // Iniciar juego cuando se entra a la vista de juego
   useEffect(() => {
     if (currentView === 'game' && !gameState) {
+      console.log('🎮 App.jsx: Iniciando nuevo juego desde useEffect');
       const newGame = startGame();
       setGameState(newGame);
     }
@@ -50,6 +51,7 @@ function App() {
   };
 
   const handleRestart = () => {
+    console.log('🔄 App.jsx: Reiniciando juego desde handleRestart');
     setIsFastMode(false);
     const newGame = startGame();
     setGameState(newGame);
