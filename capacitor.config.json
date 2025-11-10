@@ -1,0 +1,5 @@
+{
+  "appId": "com.tetris.game",
+  "appName": "Tetris Game",
+  "webDir": "dist"
+}

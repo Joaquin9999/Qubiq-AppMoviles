@@ -7,6 +7,7 @@ import finImg from '../assets/finjuego.png';
 import flechasImg from '../assets/FlechasMovimiento.png';
 import RotarImg from '../assets/Rotar.png';
 import fastImg from '../assets/fast.png';
+import logo from '../assets/logo.png';
 
 /**
  * Vista de instrucciones con carrusel
@@ -82,26 +83,22 @@ const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         <House size={32} weight="bold" color={colors.textPrimary} />
       </IconButton>
 
-      {/* Título */}
-      <h1
-        style={{
-          fontSize: '24px',
-          fontWeight: 'normal',
-          textAlign: 'center',
-          color: colors.textPrimary,
-          textShadow: `
-            2px 2px 0px ${colors.secondary},
-            4px 4px 0px ${colors.hover},
-            0 0 20px ${colors.secondary}
-          `,
-          fontFamily: "'Press Start 2P', cursive",
-          letterSpacing: '2px',
-          lineHeight: '1.5',
-          marginBottom: '30px',
-        }}
-      >
-        HOW TO<br />PLAY
-      </h1>
+      {/* Logo */}
+      <img 
+        src={logo} 
+        alt="TETRIS" 
+        style={{ 
+          position: 'absolute',
+          top: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '150px',
+          maxWidth: '50vw',
+          height: 'auto',
+          imageRendering: 'pixelated',
+          filter: `drop-shadow(0 0 15px ${colors.border})`
+        }} 
+      />
 
       {/* Imagen con texto (carrusel) */}
       <div
@@ -112,6 +109,7 @@ const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
           flexDirection: 'column',
           alignItems: 'center',
           position: 'relative',
+          marginTop: '100px',
         }}
       >
         <img
