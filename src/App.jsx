@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { startGame, handlePlayerAction, GAME_STATES } from './tetrisLogic';
 import { useGameLoop } from './hooks/useGameLoop';
 
@@ -17,13 +17,17 @@ function App() {
   // Estado del juego
   const [gameState, setGameState] = useState(null);
   const [isFastMode, setIsFastMode] = useState(false);
+  
+  // Ref para evitar doble inicialización en StrictMode
+  const gameInitialized = useRef(false);
 
   // Custom hook para el game loop
   useGameLoop(gameState, setGameState, isFastMode);
 
   // Iniciar juego cuando se entra a la vista de juego
   useEffect(() => {
-    if (currentView === 'game' && !gameState) {
+    if (currentView === 'game' && !gameState && !gameInitialized.current) {
+      gameInitialized.current = true;
       const newGame = startGame();
       setGameState(newGame);
     }
@@ -31,6 +35,10 @@ function App() {
 
   // Handlers
   const handleNavigate = (view) => {
+    // Resetear el flag cuando salimos de la vista de juego
+    if (currentView === 'game' && view !== 'game') {
+      gameInitialized.current = false;
+    }
     setCurrentView(view);
   };
 
@@ -51,8 +59,10 @@ function App() {
 
   const handleRestart = () => {
     setIsFastMode(false);
+    gameInitialized.current = false;
     const newGame = startGame();
     setGameState(newGame);
+    gameInitialized.current = true;
   };
 
   // Verificar si hay una partida en progreso

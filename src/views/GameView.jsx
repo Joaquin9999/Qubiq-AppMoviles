@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { House, Pause, Play, ArrowCounterClockwise } from 'phosphor-react';
 import { colors } from '../styles/colors';
 import { GAME_STATES } from '../tetrisLogic';
@@ -27,6 +28,76 @@ const GameView = ({
 
   const isGameOver = gameState.gameState === GAME_STATES.GAME_OVER;
   const isPaused = gameState.gameState === GAME_STATES.PAUSED;
+
+  // Estado y referencias para mantener presionado
+  const [pressedButton, setPressedButton] = useState(null);
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const isLongPressRef = useRef(false);
+
+  // Limpiar intervalos cuando el juego no está en PLAYING
+  useEffect(() => {
+    if (isGameOver || isPaused) {
+      handleButtonUp();
+    }
+  }, [isGameOver, isPaused]);
+
+  // Limpiar al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Función para manejar el inicio de la presión
+  const handleButtonDown = useCallback((action) => {
+    // No permitir si el juego está pausado o terminado
+    if (isGameOver || isPaused) return;
+    
+    isLongPressRef.current = false;
+    setPressedButton(action);
+    
+    // Retraso para detectar si es un press largo
+    timeoutRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      // Ejecutar la primera vez al empezar el long press
+      onControl(action);
+      // Intervalo de repetición
+      intervalRef.current = setInterval(() => {
+        onControl(action);
+      }, 80); // Repetir cada 80ms
+    }, 400); // Esperar 400ms para considerar que es un long press
+  }, [onControl, isGameOver, isPaused]);
+
+  // Función para manejar el fin de la presión
+  const handleButtonUp = useCallback(() => {
+    setPressedButton(null);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    isLongPressRef.current = false;
+  }, []);
+
+  // Función para manejar el click (solo si no fue long press)
+  const handleButtonClick = useCallback((action) => {
+    // No permitir si el juego está pausado o terminado
+    if (isGameOver || isPaused) return;
+    
+    // Solo ejecutar si no fue un long press
+    if (!isLongPressRef.current) {
+      onControl(action);
+    }
+  }, [onControl, isGameOver, isPaused]);
 
   return (
     <div style={{ 
@@ -160,39 +231,63 @@ const GameView = ({
           alignItems: 'center'
         }}>
           <button 
-            onClick={() => onControl('MOVE_LEFT')}
+            onClick={() => handleButtonClick('MOVE_LEFT')}
+            onMouseDown={() => handleButtonDown('MOVE_LEFT')}
+            onMouseUp={handleButtonUp}
+            onMouseLeave={handleButtonUp}
+            onTouchStart={() => handleButtonDown('MOVE_LEFT')}
+            onTouchEnd={handleButtonUp}
+            onTouchCancel={handleButtonUp}
             style={{
               width: '80px',
               height: '80px',
-              backgroundColor: colors.panel,
-              border: `3px solid ${colors.border}`,
+              backgroundColor: pressedButton === 'MOVE_LEFT' ? colors.accent : colors.panel,
+              border: `3px solid ${pressedButton === 'MOVE_LEFT' ? colors.hover : colors.border}`,
               color: colors.textPrimary,
               fontSize: '40px',
               cursor: 'pointer',
-              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              boxShadow: pressedButton === 'MOVE_LEFT'
+                ? `0 0 20px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+                : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.1s ease',
+              transform: pressedButton === 'MOVE_LEFT' ? 'scale(0.95)' : 'scale(1)',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
             }}>
             ◄
           </button>
 
           <button 
-            onClick={() => onControl('MOVE_RIGHT')}
+            onClick={() => handleButtonClick('MOVE_RIGHT')}
+            onMouseDown={() => handleButtonDown('MOVE_RIGHT')}
+            onMouseUp={handleButtonUp}
+            onMouseLeave={handleButtonUp}
+            onTouchStart={() => handleButtonDown('MOVE_RIGHT')}
+            onTouchEnd={handleButtonUp}
+            onTouchCancel={handleButtonUp}
             style={{
               width: '80px',
               height: '80px',
-              backgroundColor: colors.panel,
-              border: `3px solid ${colors.border}`,
+              backgroundColor: pressedButton === 'MOVE_RIGHT' ? colors.accent : colors.panel,
+              border: `3px solid ${pressedButton === 'MOVE_RIGHT' ? colors.hover : colors.border}`,
               color: colors.textPrimary,
               fontSize: '40px',
               cursor: 'pointer',
-              boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              boxShadow: pressedButton === 'MOVE_RIGHT'
+                ? `0 0 20px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+                : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.1s ease',
+              transform: pressedButton === 'MOVE_RIGHT' ? 'scale(0.95)' : 'scale(1)',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
             }}>
             ►
           </button>
@@ -200,25 +295,37 @@ const GameView = ({
 
         {/* Botón de Rotación */}
         <button 
-          onClick={() => onControl('ROTATE')}
+          onClick={() => handleButtonClick('ROTATE')}
+          onMouseDown={() => handleButtonDown('ROTATE')}
+          onMouseUp={handleButtonUp}
+          onMouseLeave={handleButtonUp}
+          onTouchStart={() => handleButtonDown('ROTATE')}
+          onTouchEnd={handleButtonUp}
+          onTouchCancel={handleButtonUp}
           style={{
             flex: '1',
             height: '80px',
-            backgroundColor: colors.panel,
-            border: `3px solid ${colors.border}`,
+            backgroundColor: pressedButton === 'ROTATE' ? colors.accent : colors.panel,
+            border: `3px solid ${pressedButton === 'ROTATE' ? colors.hover : colors.border}`,
             color: colors.textPrimary,
             fontSize: '10px',
             fontFamily: "'Press Start 2P', cursive",
             cursor: 'pointer',
-            boxShadow: `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+            boxShadow: pressedButton === 'ROTATE'
+              ? `0 0 20px ${colors.hover}, inset 0 0 15px ${colors.hover}30`
+              : `0 0 15px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            transition: 'all 0.2s ease',
+            transition: 'all 0.1s ease',
             letterSpacing: '1px',
-            marginLeft: '15px'
+            marginLeft: '15px',
+            transform: pressedButton === 'ROTATE' ? 'scale(0.95)' : 'scale(1)',
+            userSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
           }}>
           <div style={{ fontSize: '28px' }}>↻</div>
           <div>ROTATE</div>
@@ -273,6 +380,7 @@ const GameView = ({
         <GameOverModal 
           score={gameState.score}
           level={gameState.level}
+          onRestart={onRestart}
           onMenu={() => onNavigate('menu')}
         />
       )}
