@@ -1,11 +1,49 @@
-import { ArrowCounterClockwise, House } from 'phosphor-react';
+import { ArrowCounterClockwise, House, FloppyDisk, User } from 'phosphor-react';
+import { useState, useEffect } from 'react';
 import { colors } from '../../styles/colors';
 import DecorativeGrid from '../../components/DecorativeGrid';
+import { saveScore } from '../../utils/scores';
+import PropTypes from 'prop-types';
+import { useRef } from 'react';
 
 /**
  * Modal de Game Over
  */
-const GameOverModal = ({ score, level, onRestart, onMenu }) => {
+const GameOverModal = ({ 
+  score, 
+  level, 
+  lines, 
+  onRestart, 
+  onMenu, 
+  onSaveScore 
+}) => {
+  const [playerName, setPlayerName] = useState('');
+  const [scoreSaved, setScoreSaved] = useState(false);
+  const [showNameInput, setShowNameInput] = useState(true);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    // Enfocar el input cuando se muestra
+    if (showNameInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showNameInput]);
+
+  const handleSaveScore = (e) => {
+    e.preventDefault();
+    if (playerName.trim() && !scoreSaved) {
+      saveScore(playerName, score, level, lines);
+      setScoreSaved(true);
+      setShowNameInput(false);
+      if (onSaveScore) onSaveScore();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveScore(e);
+    }
+  };
   return (
     <div style={{
       position: 'fixed',
@@ -76,12 +114,94 @@ const GameOverModal = ({ score, level, onRestart, onMenu }) => {
           </div>
         </div>
 
+        {/* Formulario para guardar puntuación */}
+        {showNameInput && (
+          <form onSubmit={handleSaveScore} style={{ marginBottom: '25px' }}>
+            <div style={{
+              position: 'relative',
+              marginBottom: '15px',
+              border: `2px solid ${colors.border}`,
+              padding: '5px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)'
+            }}>
+              <User size={20} color={colors.textSecondary} style={{ marginRight: '10px' }} />
+              <input
+                ref={inputRef}
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value.toUpperCase().substring(0, 8))}
+                onKeyDown={handleKeyDown}
+                placeholder="TU NOMBRE"
+                maxLength={8}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  color: colors.textPrimary,
+                  fontFamily: "'Press Start 2P', cursive",
+                  fontSize: '10px',
+                  outline: 'none',
+                  letterSpacing: '1px',
+                  padding: '8px 0',
+                  '::placeholder': {
+                    color: `${colors.textSecondary}80`,
+                    opacity: 1
+                  }
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!playerName.trim() || scoreSaved}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: scoreSaved ? colors.accent : colors.primary,
+                border: `3px solid ${scoreSaved ? colors.accent : colors.primary}`,
+                color: colors.textPrimary,
+                fontSize: '10px',
+                fontFamily: "'Press Start 2P', cursive",
+                cursor: scoreSaved ? 'default' : 'pointer',
+                opacity: scoreSaved ? 0.7 : 1,
+                letterSpacing: '1px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <FloppyDisk size={14} weight="bold" />
+              {scoreSaved ? 'PUNTUACIÓN GUARDADA' : 'GUARDAR PUNTUACIÓN'}
+            </button>
+          </form>
+        )}
+
+        {scoreSaved && (
+          <p style={{
+            color: colors.accent,
+            fontSize: '9px',
+            fontFamily: "'Press Start 2P', cursive",
+            margin: '0 0 15px',
+            textAlign: 'center',
+            lineHeight: '1.4',
+            animation: 'fadeIn 0.5s ease-in'
+          }}>
+            ¡PUNTUACIÓN REGISTRADA!
+            <br />
+            <span style={{ color: colors.textSecondary, fontSize: '8px' }}>REVÍSALA EN EL RANKING</span>
+          </p>
+        )}
+
         {/* Botones */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',
-          width: '100%'
+          width: '100%',
+          marginTop: '10px'
         }}>
           <button
             onClick={onRestart}
