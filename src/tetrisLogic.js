@@ -463,6 +463,9 @@ export const clearLines = (board) => {
   return { board: newBoard, linesCleared };
 };
 
+// Puntos por movimiento descendente (soft drop)
+const POINTS_PER_ROW = 1;
+
 // Calcular puntos según líneas eliminadas (sistema original de Tetris)
 export const calculateScore = (linesCleared, level) => {
   const baseScores = {
@@ -577,13 +580,23 @@ export const gameTick = (gameState) => {
   
   if (!collided) {
     // La pieza se movió correctamente
+    // Añadir puntos por movimiento descendente
+    const newScore = (gameState.score || 0) + (gameState.level || 1) * POINTS_PER_ROW;
+    
     return {
       ...gameState,
-      currentPiece: movedPiece
+      currentPiece: movedPiece,
+      score: newScore
     };
   } else {
     // La pieza colisionó, fijarla al tablero
-    const lockResult = lockPiece(currentPiece, board, score, level, lines);
+    const lockResult = lockPiece(
+      currentPiece, 
+      board, 
+      gameState.score || 0, 
+      gameState.level || 1, 
+      gameState.lines || 0
+    );
     
     // Generar nueva pieza
     const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
@@ -593,7 +606,8 @@ export const gameTick = (gameState) => {
       return {
         ...gameState,
         ...lockResult,
-        gameState: GAME_STATES.GAME_OVER
+        gameState: GAME_STATES.GAME_OVER,
+        linesCleared: lockResult.linesCleared || 0
       };
     }
     
@@ -606,7 +620,8 @@ export const gameTick = (gameState) => {
       pieceBag: newBag,
       score: lockResult.score,
       level: lockResult.level,
-      lines: lockResult.lines
+      lines: lockResult.lines,
+      linesCleared: lockResult.linesCleared || 0
     };
   }
 };
@@ -622,7 +637,13 @@ export const processHardDrop = (gameState) => {
   const hardDropBonus = distance * 2;
   
   // Fijar la pieza al tablero
-  const lockResult = lockPiece(droppedPiece, board, score + hardDropBonus, level, lines);
+  const lockResult = lockPiece(
+    droppedPiece, 
+    board, 
+    (gameState.score || 0) + hardDropBonus, 
+    gameState.level || 1, 
+    gameState.lines || 0
+  );
   
   // Generar nueva pieza
   const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
@@ -632,7 +653,8 @@ export const processHardDrop = (gameState) => {
     return {
       ...gameState,
       ...lockResult,
-      gameState: GAME_STATES.GAME_OVER
+      gameState: GAME_STATES.GAME_OVER,
+      linesCleared: lockResult.linesCleared || 0
     };
   }
   
@@ -645,7 +667,8 @@ export const processHardDrop = (gameState) => {
     pieceBag: newBag,
     score: lockResult.score,
     level: lockResult.level,
-    lines: lockResult.lines
+    lines: lockResult.lines,
+    linesCleared: lockResult.linesCleared || 0
   };
 };
 
