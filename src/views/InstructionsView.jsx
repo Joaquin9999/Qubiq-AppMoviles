@@ -112,60 +112,87 @@ const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
           marginTop: '100px',
         }}
       >
-        <img
-          src={slides[currentSlide].img}
-          alt="Instrucción del juego"
+        {/* Contenedor de imagen con tamaño fijo */}
+        <div
           style={{
             width: '100%',
-            maxHeight: '50vh',
-            objectFit: 'contain',
-            border: `2px solid ${colors.secondary}`,
+            height: '45vh', // Altura fija para todas las imágenes
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: `3px solid ${colors.secondary}`,
             borderRadius: '12px',
             boxShadow: `0 0 20px ${colors.hover}`,
-            marginBottom: '15px',
+            marginBottom: '20px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            overflow: 'hidden'
           }}
-        />
+        >
+          <img
+            src={slides[currentSlide].img}
+            alt="Instrucción del juego"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+            }}
+          />
+        </div>
 
-        <p
+        {/* Contenedor de texto con tamaño fijo */}
+        <div
           style={{
             color: colors.textPrimary,
             fontFamily: "'Press Start 2P', cursive",
-            fontSize: '10px',
+            fontSize: '13px', // Aumentado de 10px a 13px
             textAlign: 'center',
             backgroundColor: '#000',
-            border: `1px solid ${colors.secondary}`,
+            border: `3px solid ${colors.secondary}`,
             borderRadius: '12px',
-            padding: '15px',
+            padding: '25px', // Aumentado de 15px a 25px
             boxShadow: `0 0 15px ${colors.secondary}`,
             width: '90%',
-            lineHeight: '1.5',
+            minHeight: '180px', // Altura mínima fija para el cuadro de texto
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: '1.8', // Aumentado de 1.5 a 1.8
           }}
         >
           {slides[currentSlide].text}
-        </p>
+        </div>
 
         {/* Flechas de navegación */}
         <div
           style={{
             position: 'absolute',
-            top: '40%',
+            top: '35%', // Ajustado para centrar en la imagen
             width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
             padding: '0 10px',
+            pointerEvents: 'none', // Permitir clicks solo en las flechas
           }}
         >
           <CaretLeft
-            size={32}
+            size={40} // Aumentado de 32 a 40
             color={colors.textPrimary}
             onClick={prevSlide}
-            style={{ cursor: 'pointer', filter: `drop-shadow(0 0 5px ${colors.secondary})` }}
+            style={{ 
+              cursor: 'pointer', 
+              filter: `drop-shadow(0 0 8px ${colors.secondary})`,
+              pointerEvents: 'auto'
+            }}
           />
           <CaretRight
-            size={32}
+            size={40} // Aumentado de 32 a 40
             color={colors.textPrimary}
             onClick={nextSlide}
-            style={{ cursor: 'pointer', filter: `drop-shadow(0 0 5px ${colors.secondary})` }}
+            style={{ 
+              cursor: 'pointer', 
+              filter: `drop-shadow(0 0 8px ${colors.secondary})`,
+              pointerEvents: 'auto'
+            }}
           />
         </div>
 
