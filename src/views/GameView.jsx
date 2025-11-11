@@ -15,6 +15,7 @@ import logo from '../assets/logo.png';
  */
 const GameView = ({ 
   gameState,
+  gameSessionId,
   hoveredButton,
   setHoveredButton,
   isFastMode,
@@ -380,6 +381,7 @@ const GameView = ({
         <GameOverModal 
           score={gameState.score}
           level={gameState.level}
+          gameSessionId={gameSessionId}
           onRestart={onRestart}
           onMenu={() => onNavigate('menu')}
         />

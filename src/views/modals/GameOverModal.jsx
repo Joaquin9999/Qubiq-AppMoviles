@@ -7,23 +7,33 @@ import { saveScore } from '../../utils/scores';
 /**
  * Modal de Game Over
  */
-const GameOverModal = ({ score, level, onRestart, onMenu }) => {
-  // Guardar la puntuación cuando el componente se monta
+const GameOverModal = ({ score, level, gameSessionId, onRestart, onMenu }) => {
+  // Guardar la puntuación solo una vez cuando el componente se monta
   useEffect(() => {
     const saveGameScore = async () => {
       try {
+        console.log(`[GameOverModal] Intentando guardar score: ${score}, Session ID: ${gameSessionId}`);
+        
         await saveScore({
           score,
           level,
-          lines: Math.floor(score / 10) // Estimación de líneas basada en el puntaje
+          lines: Math.floor(score / 10),
+          gameSessionId // Usar el ID de sesión como identificador único
         });
+        
+        console.log(`[GameOverModal] Score guardado exitosamente: ${score} puntos`);
       } catch (error) {
-        console.error('Error al guardar la puntuación:', error);
+        console.error('[GameOverModal] Error al guardar la puntuación:', error);
       }
     };
 
-    saveGameScore();
-  }, [score, level]);
+    // Solo guardar si tenemos un gameSessionId válido
+    if (gameSessionId) {
+      saveGameScore();
+    } else {
+      console.warn('[GameOverModal] No hay gameSessionId, no se guardará el score');
+    }
+  }, [gameSessionId]); // Solo depender del gameSessionId
   return (
     <div style={{
       position: 'fixed',

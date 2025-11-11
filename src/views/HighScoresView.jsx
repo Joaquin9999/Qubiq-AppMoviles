@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { House } from 'phosphor-react';
+import { House, Trash } from 'phosphor-react';
 import { colors } from '../styles/colors';
 import IconButton from '../components/IconButton';
-import { getScores, formatDate } from '../utils/scores';
+import { getScores, formatDate, cleanDuplicateScores, clearAllScores } from '../utils/scores';
 
 /**
  * Vista de High Scores
@@ -11,10 +11,17 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
   const [scores, setScores] = useState([]);
 
   useEffect(() => {
-    // Cargar las puntuaciones al montar el componente
-    const savedScores = getScores();
-    setScores(savedScores);
+    // Limpiar duplicados primero
+    const cleanedScores = cleanDuplicateScores();
+    setScores(cleanedScores);
   }, []);
+
+  const handleClearScores = () => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar todos los scores?')) {
+      clearAllScores();
+      setScores([]);
+    }
+  };
 
   return (
     <div style={{ 
@@ -38,6 +45,19 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         position={{ top: '20px', left: '20px' }}
       >
         <House size={32} weight="bold" color={colors.textPrimary} />
+      </IconButton>
+
+      {/* Botón para limpiar scores (temporal para testing) */}
+      <IconButton
+        size="large"
+        variant="warning"
+        isHovered={hoveredButton === 'clear-scores'}
+        onClick={handleClearScores}
+        onMouseEnter={() => setHoveredButton('clear-scores')}
+        onMouseLeave={() => setHoveredButton(null)}
+        position={{ top: '20px', right: '20px' }}
+      >
+        <Trash size={32} weight="bold" color={colors.textPrimary} />
       </IconButton>
 
       <h1 style={{ 
@@ -88,7 +108,7 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
             <div style={{ textAlign: 'right' }}>SCORE</div>
           </div>
           
-          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+          <div style={{ overflowY: 'auto' }}>
             {scores.map((score, index) => (
               <div 
                 key={score.id}

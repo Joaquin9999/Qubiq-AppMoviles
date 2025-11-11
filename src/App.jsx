@@ -17,6 +17,7 @@ function App() {
   // Estado del juego
   const [gameState, setGameState] = useState(null);
   const [isFastMode, setIsFastMode] = useState(false);
+  const [gameSessionId, setGameSessionId] = useState(null); // ID único por sesión de juego
   
   // Ref para evitar doble inicialización en StrictMode
   const gameInitialized = useRef(false);
@@ -30,6 +31,8 @@ function App() {
       gameInitialized.current = true;
       const newGame = startGame();
       setGameState(newGame);
+      // Generar un ID único para esta sesión de juego
+      setGameSessionId(`game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
     }
   }, [currentView, gameState]);
 
@@ -63,6 +66,8 @@ function App() {
     const newGame = startGame();
     setGameState(newGame);
     gameInitialized.current = true;
+    // Generar un nuevo ID de sesión para la nueva partida
+    setGameSessionId(`game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   };
 
   // Verificar si hay una partida en progreso
@@ -88,6 +93,7 @@ function App() {
     return (
       <GameView
         gameState={gameState}
+        gameSessionId={gameSessionId}
         hoveredButton={hoveredButton}
         setHoveredButton={setHoveredButton}
         isFastMode={isFastMode}
