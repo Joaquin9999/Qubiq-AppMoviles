@@ -363,7 +363,12 @@ const GameView = ({
             justifyContent: 'center',
             transition: 'all 0.1s ease',
             letterSpacing: '3px',
-            transform: isFastMode ? 'scale(0.98)' : 'scale(1)'
+            transform: isFastMode ? 'scale(0.98)' : 'scale(1)',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            WebkitTouchCallout: 'none'
           }}>
           FAST ▼▼▼
         </button>
