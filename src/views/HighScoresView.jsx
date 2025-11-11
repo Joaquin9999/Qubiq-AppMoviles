@@ -3,6 +3,7 @@ import { House, Trash } from 'phosphor-react';
 import { colors } from '../styles/colors';
 import IconButton from '../components/IconButton';
 import { getScores, formatDate, cleanDuplicateScores, clearAllScores } from '../utils/scores';
+import logo from '../assets/logo.png';
 
 /**
  * Vista de High Scores
@@ -31,7 +32,7 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
       flexDirection: 'column', 
       alignItems: 'center',
       padding: '20px',
-      paddingTop: '80px',
+      paddingTop: '120px',
       position: 'relative',
       overflowY: 'auto'
     }}>
@@ -42,103 +43,121 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         onClick={() => onNavigate('menu')}
         onMouseEnter={() => setHoveredButton('home-scores')}
         onMouseLeave={() => setHoveredButton(null)}
-        position={{ top: '20px', left: '20px' }}
+        position={{ top: '30px', left: '30px' }}
       >
         <House size={32} weight="bold" color={colors.textPrimary} />
       </IconButton>
 
-      {/* Botón para limpiar scores (temporal para testing) */}
-      <IconButton
-        size="large"
-        variant="warning"
-        isHovered={hoveredButton === 'clear-scores'}
-        onClick={handleClearScores}
-        onMouseEnter={() => setHoveredButton('clear-scores')}
-        onMouseLeave={() => setHoveredButton(null)}
-        position={{ top: '20px', right: '20px' }}
-      >
-        <Trash size={32} weight="bold" color={colors.textPrimary} />
-      </IconButton>
-
-      <h1 style={{ 
-        fontSize: '28px', 
-        fontWeight: 'normal', 
-        textAlign: 'center',
-        color: colors.textPrimary,
-        textShadow: `
-          2px 2px 0px ${colors.accent},
-          4px 4px 0px ${colors.secondary},
-          0 0 20px ${colors.accent}
-        `,
-        fontFamily: "'Press Start 2P', cursive",
-        letterSpacing: '2px',
-        lineHeight: '1.5',
-        marginBottom: '30px',
-        visibility: 'hidden',
-        height: '40px' // Mantener el espacio para el layout
-      }}>
-        
-      </h1>
+      {/* Logo */}
+      <img 
+        src={logo} 
+        alt="TETRIS" 
+        style={{ 
+          position: 'absolute',
+          top: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '150px',
+          maxWidth: '50vw',
+          height: 'auto',
+          imageRendering: 'pixelated',
+          filter: `drop-shadow(0 0 15px ${colors.border})`
+        }} 
+      />
 
       {scores.length > 0 ? (
-        <div style={{
-          width: '100%',
-          maxWidth: '500px',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          border: `2px solid ${colors.border}`,
-          borderRadius: '8px',
-          padding: '20px',
-          overflow: 'hidden',
-          marginBottom: '20px'
-        }}>
+        <>
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 2fr 1fr',
-            gap: '10px',
-            marginBottom: '15px',
-            padding: '0 10px',
-            fontFamily: "'Press Start 2P', cursive",
-            fontSize: '10px',
-            color: colors.accent,
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
+            width: '100%',
+            maxWidth: '500px',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            border: `2px solid ${colors.border}`,
+            borderRadius: '8px',
+            padding: '20px',
+            overflow: 'hidden',
+            marginBottom: '20px'
           }}>
-            <div>RANK</div>
-            <div>DATE</div>
-            <div style={{ textAlign: 'right' }}>SCORE</div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 2fr 1fr',
+              gap: '10px',
+              marginBottom: '15px',
+              padding: '0 10px',
+              fontFamily: "'Press Start 2P', cursive",
+              fontSize: '10px',
+              color: colors.accent,
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              <div>RANK</div>
+              <div>DATE</div>
+              <div style={{ textAlign: 'right' }}>SCORE</div>
+            </div>
+            
+            <div style={{ overflowY: 'auto' }}>
+              {scores.map((score, index) => (
+                <div 
+                  key={score.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 2fr 1fr',
+                    gap: '10px',
+                    padding: '12px 10px',
+                    marginBottom: '8px',
+                    backgroundColor: index % 2 === 0 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                    borderRadius: '4px',
+                    fontFamily: "'Press Start 2P', cursive",
+                    fontSize: '12px',
+                    color: colors.textPrimary,
+                    alignItems: 'center'
+                  }}
+                >
+                  <div style={{ color: index < 3 ? colors.accent : colors.textPrimary }}>
+                    {index + 1}
+                  </div>
+                  <div style={{ fontSize: '9px', color: colors.textSecondary }}>
+                    {formatDate(score.date)}
+                  </div>
+                  <div style={{ textAlign: 'right', fontWeight: 'bold', color: colors.hover }}>
+                    {score.score.toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          
-          <div style={{ overflowY: 'auto' }}>
-            {scores.map((score, index) => (
-              <div 
-                key={score.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 2fr 1fr',
-                  gap: '10px',
-                  padding: '12px 10px',
-                  marginBottom: '8px',
-                  backgroundColor: index % 2 === 0 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
-                  borderRadius: '4px',
-                  fontFamily: "'Press Start 2P', cursive",
-                  fontSize: '12px',
-                  color: colors.textPrimary,
-                  alignItems: 'center'
-                }}
-              >
-                <div style={{ color: index < 3 ? colors.accent : colors.textPrimary }}>
-                  {index + 1}
-                </div>
-                <div style={{ fontSize: '9px', color: colors.textSecondary }}>
-                  {formatDate(score.date)}
-                </div>
-                <div style={{ textAlign: 'right', fontWeight: 'bold', color: colors.hover }}>
-                  {score.score.toLocaleString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+
+          {/* Botón para eliminar scores */}
+          <button
+            onClick={handleClearScores}
+            onMouseEnter={() => setHoveredButton('clear-scores-btn')}
+            onMouseLeave={() => setHoveredButton(null)}
+            style={{
+              width: '100%',
+              maxWidth: '500px',
+              padding: '15px 20px',
+              backgroundColor: hoveredButton === 'clear-scores-btn' ? colors.warning : colors.panel,
+              border: `4px solid ${hoveredButton === 'clear-scores-btn' ? colors.hover : colors.border}`,
+              borderRadius: '8px',
+              color: colors.textPrimary,
+              fontSize: '11px',
+              fontFamily: "'Press Start 2P', cursive",
+              cursor: 'pointer',
+              boxShadow: hoveredButton === 'clear-scores-btn'
+                ? `0 0 25px ${colors.warning}, inset 0 0 15px ${colors.warning}30`
+                : `0 0 20px ${colors.border}80, inset 0 0 10px ${colors.border}20`,
+              letterSpacing: '2px',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              marginBottom: '20px'
+            }}
+          >
+            <Trash size={20} weight="bold" />
+            ELIMINAR
+          </button>
+        </>
       ) : (
         <div style={{
           color: colors.textSecondary,
