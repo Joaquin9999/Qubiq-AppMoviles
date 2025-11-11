@@ -31,7 +31,6 @@ const GameView = ({
 
   // Estado y referencias para mantener presionado
   const [pressedButton, setPressedButton] = useState(null);
-  const [scoreSaved, setScoreSaved] = useState(false);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
   const isLongPressRef = useRef(false);
@@ -381,13 +380,8 @@ const GameView = ({
         <GameOverModal 
           score={gameState.score}
           level={gameState.level}
-          lines={gameState.linesCleared}
-          onRestart={() => {
-            setScoreSaved(false);
-            onRestart();
-          }}
+          onRestart={onRestart}
           onMenu={() => onNavigate('menu')}
-          onSaveScore={() => setScoreSaved(true)}
         />
       )}
     </div>
