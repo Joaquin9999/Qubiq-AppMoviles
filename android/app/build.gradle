@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.tetris.game"
+    namespace "com.joaquin9999.tetris"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.tetris.game"
+        applicationId "com.joaquin9999.tetris"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

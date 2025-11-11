@@ -1,4 +1,4 @@
-package com.tetris.game;
+package com.joaquin9999.tetris;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Qubiq</string>
     <string name="title_activity_main">Qubiq</string>
-    <string name="package_name">com.tetris.game</string>
-    <string name="custom_url_scheme">com.tetris.game</string>
+    <string name="package_name">com.joaquin9999.tetris</string>
+    <string name="custom_url_scheme">com.joaquin9999.tetris</string>
 </resources>
