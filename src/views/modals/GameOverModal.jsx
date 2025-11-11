@@ -1,11 +1,29 @@
+import { useEffect } from 'react';
 import { ArrowCounterClockwise, House } from 'phosphor-react';
 import { colors } from '../../styles/colors';
 import DecorativeGrid from '../../components/DecorativeGrid';
+import { saveScore } from '../../utils/scores';
 
 /**
  * Modal de Game Over
  */
 const GameOverModal = ({ score, level, onRestart, onMenu }) => {
+  // Guardar la puntuación cuando el componente se monta
+  useEffect(() => {
+    const saveGameScore = async () => {
+      try {
+        await saveScore({
+          score,
+          level,
+          lines: Math.floor(score / 10) // Estimación de líneas basada en el puntaje
+        });
+      } catch (error) {
+        console.error('Error al guardar la puntuación:', error);
+      }
+    };
+
+    saveGameScore();
+  }, [score, level]);
   return (
     <div style={{
       position: 'fixed',
