@@ -53,9 +53,11 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         fontFamily: "'Press Start 2P', cursive",
         letterSpacing: '2px',
         lineHeight: '1.5',
-        marginBottom: '30px'
+        marginBottom: '30px',
+        visibility: 'hidden',
+        height: '40px' // Mantener el espacio para el layout
       }}>
-        HIGH SCORES
+        
       </h1>
 
       {scores.length > 0 ? (
