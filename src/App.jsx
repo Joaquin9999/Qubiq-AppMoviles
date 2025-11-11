@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { startGame, handlePlayerAction, GAME_STATES } from './tetrisLogic';
 import { useGameLoop } from './hooks/useGameLoop';
+import { AudioProvider } from './contexts/AudioContext';
 
 // Vistas
 import SplashScreen from './views/SplashScreen';
@@ -74,59 +75,67 @@ function App() {
   const hasGameInProgress = gameState && gameState.gameState === GAME_STATES.PAUSED;
 
   // Renderizado condicional de vistas
-  if (currentView === 'splash') {
-    return <SplashScreen onStart={() => handleNavigate('menu')} />;
-  }
+  const renderView = () => {
+    if (currentView === 'splash') {
+      return <SplashScreen onStart={() => handleNavigate('menu')} />;
+    }
 
-  if (currentView === 'menu') {
-    return (
-      <MenuView 
-        hoveredButton={hoveredButton}
-        setHoveredButton={setHoveredButton}
-        onNavigate={handleNavigate}
-        hasGameInProgress={hasGameInProgress}
-      />
-    );
-  }
+    if (currentView === 'menu') {
+      return (
+        <MenuView 
+          hoveredButton={hoveredButton}
+          setHoveredButton={setHoveredButton}
+          onNavigate={handleNavigate}
+          hasGameInProgress={hasGameInProgress}
+        />
+      );
+    }
 
-  if (currentView === 'game') {
-    return (
-      <GameView
-        gameState={gameState}
-        gameSessionId={gameSessionId}
-        hoveredButton={hoveredButton}
-        setHoveredButton={setHoveredButton}
-        isFastMode={isFastMode}
-        setIsFastMode={setIsFastMode}
-        onNavigate={handleNavigate}
-        onPause={handlePause}
-        onRestart={handleRestart}
-        onControl={handleControl}
-      />
-    );
-  }
+    if (currentView === 'game') {
+      return (
+        <GameView
+          gameState={gameState}
+          gameSessionId={gameSessionId}
+          hoveredButton={hoveredButton}
+          setHoveredButton={setHoveredButton}
+          isFastMode={isFastMode}
+          setIsFastMode={setIsFastMode}
+          onNavigate={handleNavigate}
+          onPause={handlePause}
+          onRestart={handleRestart}
+          onControl={handleControl}
+        />
+      );
+    }
 
-  if (currentView === 'highscores') {
-    return (
-      <HighScoresView 
-        hoveredButton={hoveredButton}
-        setHoveredButton={setHoveredButton}
-        onNavigate={handleNavigate}
-      />
-    );
-  }
+    if (currentView === 'highscores') {
+      return (
+        <HighScoresView 
+          hoveredButton={hoveredButton}
+          setHoveredButton={setHoveredButton}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
 
-  if (currentView === 'instructions') {
-    return (
-      <InstructionsView 
-        hoveredButton={hoveredButton}
-        setHoveredButton={setHoveredButton}
-        onNavigate={handleNavigate}
-      />
-    );
-  }
+    if (currentView === 'instructions') {
+      return (
+        <InstructionsView 
+          hoveredButton={hoveredButton}
+          setHoveredButton={setHoveredButton}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
 
-  return null;
+    return null;
+  };
+
+  return (
+    <AudioProvider>
+      {renderView()}
+    </AudioProvider>
+  );
 }
 
 export default App;

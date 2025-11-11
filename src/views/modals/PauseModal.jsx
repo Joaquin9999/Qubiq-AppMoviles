@@ -1,11 +1,14 @@
 import { Play, House } from 'phosphor-react';
 import { colors } from '../../styles/colors';
 import DecorativeGrid from '../../components/DecorativeGrid';
+import { useAudio } from '../../contexts/AudioContext';
 
 /**
  * Modal de pausa
  */
 const PauseModal = ({ onResume, onMenu }) => {
+  const { playButtonClick } = useAudio();
+
   return (
     <div style={{
       position: 'fixed',
@@ -53,7 +56,10 @@ const PauseModal = ({ onResume, onMenu }) => {
           width: '100%'
         }}>
           <button
-            onClick={onResume}
+            onClick={() => {
+              playButtonClick();
+              onResume();
+            }}
             style={{
               width: '100%',
               padding: '15px 20px',
@@ -87,7 +93,10 @@ const PauseModal = ({ onResume, onMenu }) => {
           </button>
 
           <button
-            onClick={onMenu}
+            onClick={() => {
+              playButtonClick();
+              onMenu();
+            }}
             style={{
               width: '100%',
               padding: '15px 20px',

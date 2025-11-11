@@ -8,11 +8,13 @@ import flechasImg from '../assets/FlechasMovimiento.png';
 import RotarImg from '../assets/Rotar.png';
 import fastImg from '../assets/fast.png';
 import logo from '../assets/logo.png';
+import { useAudio } from '../contexts/AudioContext';
 
 /**
  * Vista de instrucciones con carrusel
  */
 const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
+  const { playButtonClick } = useAudio();
   const slides = [
 
     {
@@ -48,10 +50,12 @@ const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
+    playButtonClick();
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
+    playButtonClick();
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
@@ -75,7 +79,10 @@ const InstructionsView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         size="large"
         variant="secondary"
         isHovered={hoveredButton === 'home-instructions'}
-        onClick={() => onNavigate('menu')}
+        onClick={() => {
+          playButtonClick();
+          onNavigate('menu');
+        }}
         onMouseEnter={() => setHoveredButton('home-instructions')}
         onMouseLeave={() => setHoveredButton(null)}
         position={{ top: '30px', left: '30px' }}

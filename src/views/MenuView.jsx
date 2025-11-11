@@ -2,6 +2,7 @@ import { GameController, Trophy, Question } from 'phosphor-react';
 import { colors } from '../styles/colors';
 import RetroButton from '../components/RetroButton';
 import logo from '../assets/logo.png';
+import { useAudio } from '../contexts/AudioContext';
 
 /**
  * Vista del menú principal
@@ -12,6 +13,8 @@ const MenuView = ({
   onNavigate,
   hasGameInProgress 
 }) => {
+  const { playButtonClick } = useAudio();
+
   return (
     <div style={{ 
       height: '100vh', 
@@ -44,7 +47,11 @@ const MenuView = ({
             variant="primary"
             isHovered={hoveredButton === 'play'}
             isActive={hasGameInProgress}
-            onClick={() => onNavigate('game')}
+            onClick={() => {
+              console.log('[MenuView] Play button clicked');
+              playButtonClick();
+              onNavigate('game');
+            }}
             onMouseEnter={() => setHoveredButton('play')}
             onMouseLeave={() => setHoveredButton(null)}
             animationDelay="0s"
@@ -56,7 +63,10 @@ const MenuView = ({
           <RetroButton
             variant="secondary"
             isHovered={hoveredButton === 'scores'}
-            onClick={() => onNavigate('highscores')}
+            onClick={() => {
+              playButtonClick();
+              onNavigate('highscores');
+            }}
             onMouseEnter={() => setHoveredButton('scores')}
             onMouseLeave={() => setHoveredButton(null)}
             animationDelay="0.1s"
@@ -68,7 +78,10 @@ const MenuView = ({
           <RetroButton
             variant="secondary"
             isHovered={hoveredButton === 'instructions'}
-            onClick={() => onNavigate('instructions')}
+            onClick={() => {
+              playButtonClick();
+              onNavigate('instructions');
+            }}
             onMouseEnter={() => setHoveredButton('instructions')}
             onMouseLeave={() => setHoveredButton(null)}
             animationDelay="0.2s"

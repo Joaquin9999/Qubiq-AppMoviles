@@ -4,12 +4,14 @@ import { colors } from '../styles/colors';
 import IconButton from '../components/IconButton';
 import { getScores, formatDate, cleanDuplicateScores, clearAllScores } from '../utils/scores';
 import logo from '../assets/logo.png';
+import { useAudio } from '../contexts/AudioContext';
 
 /**
  * Vista de High Scores
  */
 const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
   const [scores, setScores] = useState([]);
+  const { playButtonClick } = useAudio();
 
   useEffect(() => {
     // Limpiar duplicados primero
@@ -19,6 +21,7 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
 
   const handleClearScores = () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar todos los scores?')) {
+      playButtonClick();
       clearAllScores();
       setScores([]);
     }
@@ -40,7 +43,10 @@ const HighScoresView = ({ hoveredButton, setHoveredButton, onNavigate }) => {
         size="large"
         variant="secondary"
         isHovered={hoveredButton === 'home-scores'}
-        onClick={() => onNavigate('menu')}
+        onClick={() => {
+          playButtonClick();
+          onNavigate('menu');
+        }}
         onMouseEnter={() => setHoveredButton('home-scores')}
         onMouseLeave={() => setHoveredButton(null)}
         position={{ top: '30px', left: '30px' }}

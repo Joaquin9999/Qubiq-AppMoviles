@@ -3,11 +3,13 @@ import { ArrowCounterClockwise, House } from 'phosphor-react';
 import { colors } from '../../styles/colors';
 import DecorativeGrid from '../../components/DecorativeGrid';
 import { saveScore } from '../../utils/scores';
+import { useAudio } from '../../contexts/AudioContext';
 
 /**
  * Modal de Game Over
  */
 const GameOverModal = ({ score, level, gameSessionId, onRestart, onMenu }) => {
+  const { playButtonClick } = useAudio();
   // Guardar la puntuación solo una vez cuando el componente se monta
   useEffect(() => {
     const saveGameScore = async () => {
@@ -112,7 +114,10 @@ const GameOverModal = ({ score, level, gameSessionId, onRestart, onMenu }) => {
           width: '100%'
         }}>
           <button
-            onClick={onRestart}
+            onClick={() => {
+              playButtonClick();
+              onRestart();
+            }}
             style={{
               width: '100%',
               padding: '15px 20px',
@@ -146,7 +151,10 @@ const GameOverModal = ({ score, level, gameSessionId, onRestart, onMenu }) => {
           </button>
 
           <button
-            onClick={onMenu}
+            onClick={() => {
+              playButtonClick();
+              onMenu();
+            }}
             style={{
               width: '100%',
               padding: '15px 20px',

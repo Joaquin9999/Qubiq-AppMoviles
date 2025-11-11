@@ -1,14 +1,22 @@
 import { colors } from '../styles/colors';
 import DecorativeGrid from '../components/DecorativeGrid';
 import logo from '../assets/logo.png';
+import { useAudio } from '../contexts/AudioContext';
 
 /**
  * Pantalla de bienvenida / Splash Screen
  */
 const SplashScreen = ({ onStart }) => {
+  const { playButtonClick } = useAudio();
+
+  const handleStart = () => {
+    playButtonClick();
+    onStart();
+  };
+
   return (
     <div 
-      onClick={onStart}
+      onClick={handleStart}
       style={{ 
         height: '100vh', 
         maxHeight: '100vh',

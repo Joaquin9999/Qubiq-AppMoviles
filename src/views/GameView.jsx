@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { House, Pause, Play, ArrowCounterClockwise } from 'phosphor-react';
 import { colors } from '../styles/colors';
 import { GAME_STATES } from '../tetrisLogic';
+import { useAudioContext } from '../contexts/AudioContext';
 import IconButton from '../components/IconButton';
 import ScorePanel from '../components/ScorePanel';
 import GameBoard from '../components/GameBoard';
@@ -30,11 +31,127 @@ const GameView = ({
   const isGameOver = gameState.gameState === GAME_STATES.GAME_OVER;
   const isPaused = gameState.gameState === GAME_STATES.PAUSED;
 
+  // Obtener funciones de audio
+  const { 
+    playRotate, 
+    playButtonClick, 
+    playDrop, 
+    playGameOver, 
+    playLineClear, 
+    playLevelUp,
+    playBackgroundMusic,
+    stopBackgroundMusic,
+    pauseBackgroundMusic,
+    resumeBackgroundMusic 
+  } = useAudioContext();
+
   // Estado y referencias para mantener presionado
   const [pressedButton, setPressedButton] = useState(null);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
   const isLongPressRef = useRef(false);
+  const previousGameStateRef = useRef(null);
+  const previousLinesRef = useRef(gameState.lines);
+  const previousLevelRef = useRef(gameState.level);
+  const previousPieceTypeRef = useRef(gameState.currentPiece.type);
+  const musicStartedRef = useRef(false);
+  const wasPausedRef = useRef(false);
+  const previousIsPlayingRef = useRef(false);
+  const previousIsPausedRef = useRef(false);
+  const previousIsGameOverRef = useRef(false);
+
+  // Controlar música de fondo según el estado del juego
+  useEffect(() => {
+    const isPlaying = gameState.gameState === GAME_STATES.PLAYING && !isPaused && !isGameOver;
+    const hasStateChanged = 
+      isPlaying !== previousIsPlayingRef.current ||
+      isPaused !== previousIsPausedRef.current ||
+      isGameOver !== previousIsGameOverRef.current;
+
+    if (!hasStateChanged) {
+      // No hay cambios de estado, salir
+      return;
+    }
+
+    console.log(`[GameView] Music control - Playing: ${isPlaying}, Paused: ${isPaused}, GameOver: ${isGameOver}`);
+    
+    // Juego iniciado/jugando
+    if (isPlaying) {
+      if (!musicStartedRef.current) {
+        // Iniciar música por primera vez
+        console.log('[GameView] Iniciando música de fondo');
+        playBackgroundMusic();
+        musicStartedRef.current = true;
+        wasPausedRef.current = false;
+      } else if (wasPausedRef.current) {
+        // Reanudar música después de pausa
+        console.log('[GameView] Reanudando música');
+        resumeBackgroundMusic();
+        wasPausedRef.current = false;
+      }
+    }
+    // Juego pausado
+    else if (isPaused && musicStartedRef.current && !wasPausedRef.current) {
+      console.log('[GameView] Pausando música');
+      pauseBackgroundMusic();
+      wasPausedRef.current = true;
+    }
+    // Juego terminado
+    else if (isGameOver && musicStartedRef.current) {
+      console.log('[GameView] Game Over - Deteniendo música');
+      stopBackgroundMusic();
+      musicStartedRef.current = false;
+      wasPausedRef.current = false;
+    }
+
+    // Actualizar referencias
+    previousIsPlayingRef.current = isPlaying;
+    previousIsPausedRef.current = isPaused;
+    previousIsGameOverRef.current = isGameOver;
+  }, [gameState.gameState, isPaused, isGameOver, playBackgroundMusic, resumeBackgroundMusic, pauseBackgroundMusic, stopBackgroundMusic]);
+  
+  // Detener música al desmontar
+  useEffect(() => {
+    return () => {
+      if (musicStartedRef.current) {
+        console.log('[GameView] Desmontando componente - Deteniendo música');
+        stopBackgroundMusic();
+      }
+    };
+  }, []);
+
+  // Detectar cuando una pieza se fija (lockea) - cuando cambia el tipo de pieza
+  useEffect(() => {
+    if (gameState.currentPiece.type !== previousPieceTypeRef.current && previousPieceTypeRef.current !== null) {
+      // Una nueva pieza ha aparecido, significa que la anterior se fijó
+      playDrop();
+    }
+    previousPieceTypeRef.current = gameState.currentPiece.type;
+  }, [gameState.currentPiece.type, playDrop]);
+
+  // Detectar cuando se completan líneas
+  useEffect(() => {
+    if (gameState.lines > previousLinesRef.current) {
+      playLineClear();
+    }
+    previousLinesRef.current = gameState.lines;
+  }, [gameState.lines, playLineClear]);
+
+  // Detectar cuando sube de nivel
+  useEffect(() => {
+    if (gameState.level > previousLevelRef.current) {
+      playLevelUp();
+    }
+    previousLevelRef.current = gameState.level;
+  }, [gameState.level, playLevelUp]);
+
+  // Detectar cambio a game over y reproducir sonido
+  useEffect(() => {
+    if (isGameOver && previousGameStateRef.current !== GAME_STATES.GAME_OVER) {
+      playGameOver();
+    }
+    previousGameStateRef.current = gameState.gameState;
+  }, [isGameOver, gameState.gameState, playGameOver]);
 
   // Limpiar intervalos cuando el juego no está en PLAYING
   useEffect(() => {
@@ -66,14 +183,29 @@ const GameView = ({
     // Retraso para detectar si es un press largo
     timeoutRef.current = setTimeout(() => {
       isLongPressRef.current = true;
+      
+      // Reproducir sonido según la acción
+      if (action === 'ROTATE') {
+        playRotate();
+      } else if (action === 'MOVE_LEFT' || action === 'MOVE_RIGHT') {
+        playButtonClick();
+      }
+      
       // Ejecutar la primera vez al empezar el long press
       onControl(action);
+      
       // Intervalo de repetición
       intervalRef.current = setInterval(() => {
+        // Reproducir sonido en cada repetición
+        if (action === 'ROTATE') {
+          playRotate();
+        } else if (action === 'MOVE_LEFT' || action === 'MOVE_RIGHT') {
+          playButtonClick();
+        }
         onControl(action);
       }, 80); // Repetir cada 80ms
     }, 400); // Esperar 400ms para considerar que es un long press
-  }, [onControl, isGameOver, isPaused]);
+  }, [onControl, isGameOver, isPaused, playRotate, playButtonClick]);
 
   // Función para manejar el fin de la presión
   const handleButtonUp = useCallback(() => {
@@ -96,9 +228,15 @@ const GameView = ({
     
     // Solo ejecutar si no fue un long press
     if (!isLongPressRef.current) {
+      // Reproducir sonido según la acción
+      if (action === 'ROTATE') {
+        playRotate();
+      } else if (action === 'MOVE_LEFT' || action === 'MOVE_RIGHT') {
+        playButtonClick();
+      }
       onControl(action);
     }
-  }, [onControl, isGameOver, isPaused]);
+  }, [onControl, isGameOver, isPaused, playRotate, playButtonClick]);
 
   return (
     <div style={{ 
@@ -162,7 +300,10 @@ const GameView = ({
           size="small"
           variant="accent"
           isHovered={hoveredButton === 'pause'}
-          onClick={onPause}
+          onClick={() => {
+            playButtonClick();
+            onPause();
+          }}
           onMouseEnter={() => setHoveredButton('pause')}
           onMouseLeave={() => setHoveredButton(null)}
         >
@@ -177,7 +318,10 @@ const GameView = ({
           size="small"
           variant="warning"
           isHovered={hoveredButton === 'restart'}
-          onClick={onRestart}
+          onClick={() => {
+            playButtonClick();
+            onRestart();
+          }}
           onMouseEnter={() => setHoveredButton('restart')}
           onMouseLeave={() => setHoveredButton(null)}
         >
