@@ -1,7 +1,3 @@
-// PASO 1: Estructura de Datos Básica del Tetris
-
-// Definición de las 7 piezas tetrominos con sus rotaciones
-// Cada pieza es una matriz donde 1 representa un bloque
 export const TETROMINOS = {
   I: {
     shape: [
@@ -25,7 +21,7 @@ export const TETROMINOS = {
        [0, 1, 0, 0],
        [0, 1, 0, 0]]
     ],
-    color: '#00FFFF' // Cian
+    color: '#00FFFF'
   },
   
   O: {
@@ -33,7 +29,7 @@ export const TETROMINOS = {
       [[1, 1],
        [1, 1]]
     ],
-    color: '#FFFF00' // Amarillo
+    color: '#FFFF00'
   },
   
   T: {
@@ -54,7 +50,7 @@ export const TETROMINOS = {
        [1, 1, 0],
        [0, 1, 0]]
     ],
-    color: '#B026FF' // Púrpura
+    color: '#B026FF'
   },
   
   S: {
@@ -67,7 +63,7 @@ export const TETROMINOS = {
        [0, 1, 1],
        [0, 0, 1]]
     ],
-    color: '#00FF00' // Verde
+    color: '#00FF00'
   },
   
   Z: {
@@ -80,7 +76,7 @@ export const TETROMINOS = {
        [0, 1, 1],
        [0, 1, 0]]
     ],
-    color: '#FF0000' // Rojo
+    color: '#FF0000'
   },
   
   J: {
@@ -101,7 +97,7 @@ export const TETROMINOS = {
        [0, 1, 0],
        [1, 1, 0]]
     ],
-    color: '#0000FF' // Azul
+    color: '#0000FF'
   },
   
   L: {
@@ -122,22 +118,20 @@ export const TETROMINOS = {
        [0, 1, 0],
        [0, 1, 0]]
     ],
-    color: '#FF7A00' // Naranja
+    color: '#FF7A00'
   }
 };
 
-// Constantes del juego
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 
-// Crear tablero vacío (matriz 20x10)
 export const createEmptyBoard = () => {
   return Array(BOARD_HEIGHT).fill(null).map(() => 
     Array(BOARD_WIDTH).fill(0)
   );
 };
 
-// Estados del juego
+
 export const GAME_STATES = {
   IDLE: 'idle',
   PLAYING: 'playing',
@@ -145,12 +139,7 @@ export const GAME_STATES = {
   GAME_OVER: 'gameOver'
 };
 
-// ============================================
-// SISTEMA DE GENERACIÓN DE PIEZAS - "7-BAG SYSTEM"
-// Sistema del Tetris original que garantiza distribución justa
-// ============================================
 
-// Mezclar array usando el algoritmo Fisher-Yates
 const shuffleArray = (array) => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -160,37 +149,34 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
-// Crear una nueva bolsa con las 7 piezas mezcladas
 const createNewBag = () => {
   const pieces = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
   return shuffleArray(pieces);
 };
 
-// Obtener la siguiente pieza de la bolsa (sistema 7-bag del Tetris original)
-// Ahora recibe y retorna la bolsa como parámetro para evitar estado compartido
+
 const getNextPieceFromBag = (currentBag) => {
   let bag = [...currentBag];
   
-  // Si la bolsa está vacía, crear una nueva
+
   if (bag.length === 0) {
     bag = createNewBag();
   }
   
-  // Sacar la primera pieza de la bolsa
+
   const piece = bag.shift();
   
   return { piece, bag };
 };
 
-// Obtener una pieza aleatoria (sistema 7-bag del Tetris original)
-// Ahora recibe la bolsa como parámetro
+
 export const getRandomTetromino = (bag = []) => {
   const { piece: randomPiece, bag: newBag } = getNextPieceFromBag(bag);
   
   return {
     tetromino: {
       type: randomPiece,
-      shape: TETROMINOS[randomPiece].shape[0], // Primera rotación
+      shape: TETROMINOS[randomPiece].shape[0],
       color: TETROMINOS[randomPiece].color,
       rotation: 0,
       x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOS[randomPiece].shape[0][0].length / 2),
@@ -200,9 +186,7 @@ export const getRandomTetromino = (bag = []) => {
   };
 };
 
-// Estado inicial del juego
 export const createInitialGameState = () => {
-  // Generar las primeras dos piezas y la bolsa inicial
   const { tetromino: currentPiece, bag: bag1 } = getRandomTetromino([]);
   const { tetromino: nextPiece, bag: bag2 } = getRandomTetromino(bag1);
   
@@ -210,7 +194,7 @@ export const createInitialGameState = () => {
     board: createEmptyBoard(),
     currentPiece,
     nextPiece,
-    pieceBag: bag2, // Guardar la bolsa en el estado del juego
+    pieceBag: bag2,
     gameState: GAME_STATES.IDLE,
     score: 0,
     level: 1,
@@ -218,11 +202,6 @@ export const createInitialGameState = () => {
   };
 };
 
-// ============================================
-// PASO 2: SISTEMA DE PIEZAS
-// ============================================
-
-// Rotar pieza en sentido horario
 export const rotatePiece = (piece) => {
   const { type, rotation } = piece;
   const tetromino = TETROMINOS[type];
@@ -235,7 +214,6 @@ export const rotatePiece = (piece) => {
   };
 };
 
-// Rotar pieza en sentido antihorario
 export const rotatePieceCounterClockwise = (piece) => {
   const { type, rotation } = piece;
   const tetromino = TETROMINOS[type];
@@ -248,7 +226,6 @@ export const rotatePieceCounterClockwise = (piece) => {
   };
 };
 
-// Mover pieza a la izquierda
 export const movePieceLeft = (piece) => {
   return {
     ...piece,
@@ -256,7 +233,6 @@ export const movePieceLeft = (piece) => {
   };
 };
 
-// Mover pieza a la derecha
 export const movePieceRight = (piece) => {
   return {
     ...piece,
@@ -264,7 +240,6 @@ export const movePieceRight = (piece) => {
   };
 };
 
-// Mover pieza hacia abajo
 export const movePieceDown = (piece) => {
   return {
     ...piece,
@@ -272,7 +247,6 @@ export const movePieceDown = (piece) => {
   };
 };
 
-// Obtener las coordenadas absolutas de la pieza en el tablero
 export const getPieceCoordinates = (piece) => {
   const coordinates = [];
   const { shape, x, y } = piece;
@@ -291,7 +265,6 @@ export const getPieceCoordinates = (piece) => {
   return coordinates;
 };
 
-// Clonar una pieza
 export const clonePiece = (piece) => {
   return {
     ...piece,
@@ -299,28 +272,20 @@ export const clonePiece = (piece) => {
   };
 };
 
-// ============================================
-// PASO 3: MOVIMIENTO BÁSICO Y VALIDACIÓN
-// ============================================
-
-// Verificar si una posición está dentro de los límites del tablero
 const isWithinBounds = (x, y) => {
   return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT;
 };
 
-// Verificar si una pieza colisiona con el tablero o con otras piezas
 export const checkCollision = (piece, board) => {
   const coordinates = getPieceCoordinates(piece);
   
   for (let coord of coordinates) {
     const { x, y } = coord;
     
-    // Verificar límites del tablero
     if (!isWithinBounds(x, y)) {
       return true;
     }
     
-    // Verificar colisión con piezas ya colocadas
     if (board[y] && board[y][x] !== 0) {
       return true;
     }
@@ -329,70 +294,61 @@ export const checkCollision = (piece, board) => {
   return false;
 };
 
-// Intentar mover la pieza a la izquierda
 export const tryMoveLeft = (piece, board) => {
   const movedPiece = movePieceLeft(piece);
   
   if (checkCollision(movedPiece, board)) {
-    return piece; // No se puede mover, retornar pieza original
+    return piece;
   }
   
   return movedPiece;
 };
 
-// Intentar mover la pieza a la derecha
 export const tryMoveRight = (piece, board) => {
   const movedPiece = movePieceRight(piece);
   
   if (checkCollision(movedPiece, board)) {
-    return piece; // No se puede mover, retornar pieza original
+    return piece;
   }
   
   return movedPiece;
 };
 
-// Intentar mover la pieza hacia abajo
 export const tryMoveDown = (piece, board) => {
   const movedPiece = movePieceDown(piece);
   
   if (checkCollision(movedPiece, board)) {
-    return { piece, collided: true }; // Colisionó
+    return { piece, collided: true };
   }
   
   return { piece: movedPiece, collided: false };
 };
 
-// Intentar rotar la pieza
 export const tryRotate = (piece, board) => {
   const rotatedPiece = rotatePiece(piece);
   
   if (checkCollision(rotatedPiece, board)) {
-    // Intentar wall kick (desplazar la pieza si rota cerca de una pared)
-    // Probar desplazamiento a la izquierda
     const kickedLeft = { ...rotatedPiece, x: rotatedPiece.x - 1 };
     if (!checkCollision(kickedLeft, board)) {
       return kickedLeft;
     }
     
-    // Probar desplazamiento a la derecha
     const kickedRight = { ...rotatedPiece, x: rotatedPiece.x + 1 };
     if (!checkCollision(kickedRight, board)) {
       return kickedRight;
     }
     
-    // Probar desplazamiento doble a la derecha
     const kickedRight2 = { ...rotatedPiece, x: rotatedPiece.x + 2 };
     if (!checkCollision(kickedRight2, board)) {
       return kickedRight2;
     }
     
-    return piece; // No se puede rotar
+    return piece;
   }
   
   return rotatedPiece;
 };
 
-// Caída rápida (hard drop) - dejar caer la pieza hasta el fondo
 export const hardDrop = (piece, board) => {
   let droppedPiece = { ...piece };
   let distance = 0;
@@ -409,27 +365,18 @@ export const hardDrop = (piece, board) => {
   return { piece: droppedPiece, distance };
 };
 
-// Obtener la posición fantasma (ghost piece) - muestra dónde caerá la pieza
 export const getGhostPiece = (piece, board) => {
   const { piece: ghostPiece } = hardDrop(piece, board);
   return ghostPiece;
 };
 
-// ============================================
-// PASO 5: COLOCAR PIEZAS Y LÍNEAS COMPLETAS
-// ============================================
-
-// Colocar la pieza actual en el tablero
 export const placePiece = (piece, board) => {
-  // Crear una copia del tablero
   const newBoard = board.map(row => [...row]);
   const coordinates = getPieceCoordinates(piece);
   
-  // Colocar cada bloque de la pieza en el tablero
   for (let coord of coordinates) {
     const { x, y } = coord;
     if (y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH) {
-      // Guardar el color de la pieza en el tablero
       newBoard[y][x] = piece.color;
     }
   }
@@ -437,25 +384,19 @@ export const placePiece = (piece, board) => {
   return newBoard;
 };
 
-// Verificar si una línea está completa
 const isLineComplete = (line) => {
   return line.every(cell => cell !== 0);
 };
 
-// Detectar y eliminar líneas completas
 export const clearLines = (board) => {
   let newBoard = [...board];
   let linesCleared = 0;
   
-  // Recorrer desde abajo hacia arriba
   for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
     if (isLineComplete(newBoard[y])) {
-      // Eliminar la línea completa
       newBoard.splice(y, 1);
-      // Agregar una línea vacía al principio
       newBoard.unshift(Array(BOARD_WIDTH).fill(0));
       linesCleared++;
-      // Volver a verificar esta fila (porque bajó una nueva)
       y++;
     }
   }
@@ -463,55 +404,43 @@ export const clearLines = (board) => {
   return { board: newBoard, linesCleared };
 };
 
-// Calcular puntos según líneas eliminadas (sistema original de Tetris)
 export const calculateScore = (linesCleared, level) => {
   const baseScores = {
-    1: 100,   // Single
-    2: 300,   // Double
-    3: 500,   // Triple
-    4: 800    // Tetris
+    1: 100,
+    2: 300,
+    3: 500,
+    4: 800
   };
   
   return (baseScores[linesCleared] || 0) * level;
 };
 
-// Calcular el nivel según las líneas completadas
 export const calculateLevel = (totalLines) => {
   return Math.floor(totalLines / 10) + 1;
 };
 
-// Obtener la velocidad de caída según el nivel (en milisegundos)
 export const getDropSpeed = (level) => {
-  // Fórmula del Tetris original
-  const baseSpeed = 1000; // 1 segundo en nivel 1
-  const speedDecrease = 50; // Disminuye 50ms por nivel
-  const minSpeed = 100; // Velocidad mínima
+  const baseSpeed = 1000;
+  const speedDecrease = 50;
+  const minSpeed = 100;
   
   return Math.max(minSpeed, baseSpeed - (level - 1) * speedDecrease);
 };
 
-// Verificar si el juego ha terminado (Game Over)
 export const isGameOver = (piece, board) => {
-  // Si la pieza nueva colisiona al aparecer, es Game Over
   return checkCollision(piece, board);
 };
 
-// Procesar el lock de una pieza (colocar y verificar líneas)
 export const lockPiece = (piece, board, currentScore, currentLevel, currentLines) => {
-  // Colocar la pieza en el tablero
   const newBoard = placePiece(piece, board);
   
-  // Verificar y eliminar líneas completas
   const { board: clearedBoard, linesCleared } = clearLines(newBoard);
   
-  // Calcular nueva puntuación
   const scoreGained = calculateScore(linesCleared, currentLevel);
   const newScore = currentScore + scoreGained;
   
-  // Actualizar líneas totales
   const newTotalLines = currentLines + linesCleared;
   
-  // Calcular nuevo nivel
   const newLevel = calculateLevel(newTotalLines);
   
   return {
@@ -523,11 +452,6 @@ export const lockPiece = (piece, board, currentScore, currentLevel, currentLines
   };
 };
 
-// ============================================
-// PASO 6: SISTEMA DE JUEGO
-// ============================================
-
-// Generar nueva pieza y avanzar la siguiente
 export const spawnNextPiece = (nextPiece, currentBag) => {
   const { tetromino: newNextPiece, bag: newBag } = getRandomTetromino(currentBag);
   
@@ -538,7 +462,6 @@ export const spawnNextPiece = (nextPiece, currentBag) => {
   };
 };
 
-// Iniciar el juego
 export const startGame = () => {
   const initialState = createInitialGameState();
   
@@ -548,7 +471,6 @@ export const startGame = () => {
   };
 };
 
-// Pausar el juego
 export const pauseGame = (gameState) => {
   if (gameState === GAME_STATES.PLAYING) {
     return GAME_STATES.PAUSED;
@@ -558,37 +480,29 @@ export const pauseGame = (gameState) => {
   return gameState;
 };
 
-// Terminar el juego (Game Over)
 export const endGame = () => {
   return GAME_STATES.GAME_OVER;
 };
 
-// Reiniciar el juego
 export const resetGame = () => {
   return startGame();
 };
 
-// Actualizar el tick del juego (caída automática)
 export const gameTick = (gameState) => {
   const { currentPiece, board, score, level, lines, nextPiece, pieceBag } = gameState;
   
-  // Intentar mover la pieza hacia abajo
   const { piece: movedPiece, collided } = tryMoveDown(currentPiece, board);
   
   if (!collided) {
-    // La pieza se movió correctamente
     return {
       ...gameState,
       currentPiece: movedPiece
     };
   } else {
-    // La pieza colisionó, fijarla al tablero
     const lockResult = lockPiece(currentPiece, board, score, level, lines);
     
-    // Generar nueva pieza
     const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
     
-    // Verificar si hay Game Over
     if (isGameOver(newPiece, lockResult.board)) {
       return {
         ...gameState,
@@ -597,7 +511,6 @@ export const gameTick = (gameState) => {
       };
     }
     
-    // Continuar el juego con nueva pieza
     return {
       ...gameState,
       board: lockResult.board,
@@ -611,23 +524,17 @@ export const gameTick = (gameState) => {
   }
 };
 
-// Procesar hard drop (caída instantánea)
 export const processHardDrop = (gameState) => {
   const { currentPiece, board, score, level, lines, nextPiece, pieceBag } = gameState;
   
-  // Dejar caer la pieza hasta el fondo
   const { piece: droppedPiece, distance } = hardDrop(currentPiece, board);
   
-  // Bonus por hard drop (2 puntos por celda)
   const hardDropBonus = distance * 2;
   
-  // Fijar la pieza al tablero
   const lockResult = lockPiece(droppedPiece, board, score + hardDropBonus, level, lines);
   
-  // Generar nueva pieza
   const { currentPiece: newPiece, nextPiece: newNextPiece, pieceBag: newBag } = spawnNextPiece(nextPiece, pieceBag);
   
-  // Verificar si hay Game Over
   if (isGameOver(newPiece, lockResult.board)) {
     return {
       ...gameState,
@@ -636,7 +543,7 @@ export const processHardDrop = (gameState) => {
     };
   }
   
-  // Continuar el juego con nueva pieza
+  
   return {
     ...gameState,
     board: lockResult.board,
@@ -649,7 +556,9 @@ export const processHardDrop = (gameState) => {
   };
 };
 
-// Manejar acciones del jugador
+
+
+
 export const handlePlayerAction = (action, gameState) => {
   const { currentPiece, board } = gameState;
   
@@ -672,7 +581,7 @@ export const handlePlayerAction = (action, gameState) => {
         return {
           ...gameState,
           currentPiece: downPiece,
-          score: gameState.score + 1 // Bonus por caída manual
+          score: gameState.score + 1 
         };
       }
       return gameState;
